@@ -10,6 +10,7 @@ import (
 	"time"
 
 	hclog "github.com/hashicorp/go-hclog"
+	cstructs "github.com/hashicorp/nomad/client/structs"
 	"github.com/hashicorp/nomad/drivers/shared/eventer"
 	"github.com/hashicorp/nomad/helper/pluginutils/loader"
 	"github.com/hashicorp/nomad/plugins/base"
@@ -117,7 +118,7 @@ type Driver struct {
 func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 	ctx, cancel := context.WithCancel(context.Background())
 	logger = logger.Named(pluginName)
-	logger.Error("NewLibvirtDriver called")
+	logger.Debug("NewLibvirtDriver called")
 
 	// NewLibvirtDriver will be called multiple times
 	// Although I dont think multiple NewLibvirtDriver might run at the same time
@@ -135,7 +136,7 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 			return
 		}
 
-		domainManager, err = virtwrap.NewLibvirtDomainManager(domainConn)
+		domainManager, err = virtwrap.NewLibvirtDomainManager(domainConn, logger)
 		if err != nil {
 			return
 		}
@@ -161,10 +162,10 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 		}
 
 		// start the domain event loop
-		go driver.eventLoop(ctx)
+		go driver.eventLoop()
 
 		// start the domain stats loop
-		go driver.statsLoop(ctx)
+		go driver.statsLoop()
 	})
 
 	return driver
@@ -198,6 +199,7 @@ func (d *Driver) Fingerprint(ctx context.Context) (<-chan *drivers.Fingerprint, 
 }
 
 func (d *Driver) handleFingerprint(ctx context.Context, ch chan *drivers.Fingerprint) {
+	defer close(ch)
 	ticker := time.NewTimer(0)
 	for {
 		select {
@@ -244,6 +246,10 @@ func (d *Driver) buildFingerprint() *drivers.Fingerprint {
 }
 
 func (d *Driver) RecoverTask(handle *drivers.TaskHandle) error {
+	if handle == nil {
+		return fmt.Errorf("error: handle cannot be nil in RecoverTask")
+	}
+
 	if _, ok := d.tasks.Get(handle.Config.ID); ok {
 		// nothing to do if handle found in task store
 		return nil
@@ -254,15 +260,18 @@ func (d *Driver) RecoverTask(handle *drivers.TaskHandle) error {
 		return fmt.Errorf("failed to decode driver task state: %v", err)
 	}
 
-	// create new handle if not found
+	// create new handle from restored state from state db
+	// libvirt doesn't track the creation/compeltion time of domains
+	// so I'm tracking those myself
 	h := &taskHandle{
 		resultChan:  make(chan *drivers.ExitResult),
-		task:        handle.Config, //contains taskid allocid for future use
+		task:        handle.Config,
 		startedAt:   handleState.startedAt,
 		completedAt: handleState.completedAt,
 		exitResult:  handleState.exitResult,
 	}
 
+	// set the in memory handle in task store
 	d.tasks.Set(handle.Config.ID, h)
 
 	return nil
@@ -281,36 +290,38 @@ func (d *Driver) StartTask(cfg *drivers.TaskConfig) (*drivers.TaskHandle, *drive
 
 	// make all relevant strings lower case before processing
 	taskConfig.ToLower()
-	d.logger.Debug("taskConfig lower cased", "taskconfig", taskConfig)
 
 	handle := drivers.NewTaskHandle(taskHandleVersion)
 	handle.Config = cfg
 
-	domainSpec, err := domainManager.SyncVM(cfg, &taskConfig, d.logger)
+	// define and start domain
+	domainSpec, err := domainManager.SyncVM(cfg, &taskConfig)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// Detect domain address
-	d.logger.Debug("get domain if addr waiting for ipv4 address")
-	guestIf, err := domainManager.DomainIfAddr(domainSpec.Name, true, d.logger)
+	// stop and undefine domain if can't get ipv4 address
+	guestIf, err := domainManager.DomainIfAddr(domainSpec.Name, true)
 	if err != nil {
 		d.logger.Error("error getting domain address waiting for ipv4 addr", "error", err)
+		domainManager.KillVM(domainSpec.Name)
+		domainManager.DestroyVM(domainSpec.Name)
 		return nil, nil, err
 	}
 
 	// default value for net, works for the following two cases:
 	// 1. the domain has only lo interface
 	// 1. or the domain has a non-lo interface but has no ip address assigned
-	net := &drivers.DriverNetwork{}
+	drvNet := &drivers.DriverNetwork{}
 
 	if guestIf != nil {
 		for _, ip := range guestIf.IPs {
-			d.logger.Debug("domain interface from ga", "ip", ip.IP, "type", ip.Type, "prefix", ip.Prefix)
+			d.logger.Debug("domain interface from guest agent", "ip", ip.IP, "type", ip.Type, "prefix", ip.Prefix)
 			if ip.Type == "ipv4" {
-				net.IP = ip.IP
+				drvNet.IP = ip.IP
 				if len(taskConfig.Interfaces) > 0 && taskConfig.Interfaces[0].InterfaceBindingMethod != "network" {
-					net.AutoAdvertise = true
+					drvNet.AutoAdvertise = true
 				}
 			}
 		}
@@ -321,48 +332,61 @@ func (d *Driver) StartTask(cfg *drivers.TaskConfig) (*drivers.TaskHandle, *drive
 		resultChan: make(chan *drivers.ExitResult),
 		task:       cfg, //contains taskid allocid for future use
 		startedAt:  time.Now().Round(time.Millisecond),
-		net:        net,
+		net:        drvNet,
+		resourceUsage: &cstructs.TaskResourceUsage{
+			ResourceUsage: &cstructs.ResourceUsage{
+				MemoryStats: &cstructs.MemoryStats{},
+				CpuStats:    &cstructs.CpuStats{},
+			},
+		}, // initial empty usage data, so that we won't return nil in stats channel
 	}
 
 	if err := handle.SetDriverState(h.buildState()); err != nil {
-		fmt.Println("error persisting handle state")
+		d.logger.Error("error persisting handle state")
 		return nil, nil, err
 	}
 	d.tasks.Set(cfg.ID, h)
-	// go h.run()
 
-	return handle, nil, nil
+	d.logger.Debug("returning from starttask")
+	return handle, drvNet, nil
 }
 
 func (d *Driver) WaitTask(ctx context.Context, taskID string) (<-chan *drivers.ExitResult, error) {
+	d.logger.Debug("waittaks called")
 	h, ok := d.tasks.Get(taskID)
 	if !ok {
 		return nil, drivers.ErrTaskNotFound
 	}
+	d.logger.Debug("wait task returning")
 	return h.resultChan, nil
 }
 
 func (d *Driver) StopTask(taskID string, timeout time.Duration, signal string) error {
+	d.logger.Debug("stoptask called")
 	h, ok := d.tasks.Get(taskID)
 	if !ok {
 		return drivers.ErrTaskNotFound
 	}
+	d.logger.Debug("stoptask returning")
 	return h.KillVM()
 }
 
 func (d *Driver) DestroyTask(taskID string, force bool) error {
+	d.logger.Debug("destroytask called")
 	h, ok := d.tasks.Get(taskID)
 	if !ok {
 		return drivers.ErrTaskNotFound
 	}
 	if err := h.DestroyVM(); err != nil {
-		return nil
+		return err
 	}
 	d.tasks.Delete(taskID)
+	d.logger.Debug("destroytask returning")
 	return nil
 }
 
 func (d *Driver) InspectTask(taskID string) (*drivers.TaskStatus, error) {
+	d.logger.Debug("inspecttask called")
 	h, ok := d.tasks.Get(taskID)
 	if !ok {
 		return nil, drivers.ErrTaskNotFound
@@ -391,57 +415,66 @@ func (d *Driver) InspectTask(taskID string) (*drivers.TaskStatus, error) {
 		status.State = drivers.TaskStateExited
 	}
 
+	d.logger.Debug("inspecttask returning")
 	return status, nil
 }
 
 func (d *Driver) TaskStats(ctx context.Context, taskID string, interval time.Duration) (<-chan *drivers.TaskResourceUsage, error) {
+	d.logger.Debug("taskstats called")
 	h, ok := d.tasks.Get(taskID)
 	if !ok {
 		return nil, drivers.ErrTaskNotFound
 	}
 
+	d.logger.Debug("taskstats returning")
 	return h.Stats(ctx, interval)
 }
 
 func (d *Driver) TaskEvents(ctx context.Context) (<-chan *drivers.TaskEvent, error) {
+	d.logger.Debug("task events called and returning")
 	return d.eventer.TaskEvents(ctx)
 }
 
 func (d *Driver) SignalTask(taskID string, signal string) error {
+	d.logger.Debug("signal task called  and returning")
 	return fmt.Errorf("libvirt driver can't signal commands")
 }
 
 func (d *Driver) ExecTask(taskID string, cmdArgs []string, timeout time.Duration) (*drivers.ExecTaskResult, error) {
+	d.logger.Debug("exec task called and returning")
 	return nil, fmt.Errorf("libvirt driver can't execute commands")
 }
 
 // method of InternalDriverPlugin
-func (d *Driver) Shutdown() {
-	d.signalShutdown()
-	if domainConn != nil {
-		domainConn.Close()
-		domainConn = nil
-	}
-}
+// func (d *Driver) Shutdown() {
+// 	d.signalShutdown()
+// 	if domainConn != nil {
+// 		domainConn.Close()
+// 		domainConn = nil
+// 	}
+// }
 
-func (d *Driver) eventLoop(ctx context.Context) {
+func (d *Driver) eventLoop() {
+	d.logger.Debug("eventLoop called")
 	for {
 		select {
 		case event := <-d.domainEventChan:
 			d.handleEvent(event)
-		case <-ctx.Done():
+		case <-d.ctx.Done():
 			// exiting
+			d.logger.Debug("breaking from eventLoop")
 			return
 		}
 	}
 }
 
 func (d *Driver) handleEvent(event api.LibvirtEvent) {
+	d.logger.Debug("handleEvent called")
 	h, ok := d.tasks.Get(event.TaskID)
 	if !ok {
 		return
 	}
-	fmt.Printf("handling event for task: %s(job name),%s(allocid), %s(taskid)\n", h.task.JobName, h.task.AllocID, h.task.ID)
+	d.logger.Debug("handling event for task", "job name", h.task.JobName, "allocid", h.task.AllocID, "taskid", h.task.ID)
 	switch event.State {
 	case api.Shutoff, api.Crashed:
 		exitCode := 0
@@ -460,7 +493,12 @@ func (d *Driver) handleEvent(event api.LibvirtEvent) {
 			OOMKilled: false,
 			Err:       nil,
 		}
+		// someone called driver.WaitTask again after job stop command is issued
+		// so 2 people (this mysterious someone and task runner) are waiting for the exitresult here
+		// so I sendout 2 exitResult here
 		h.resultChan <- h.exitResult
+		h.resultChan <- h.exitResult
+		d.logger.Debug("exit result sent to resultChan", "exitResult", h.exitResult)
 	}
 	// send task event in any case
 	d.eventer.EmitEvent(&drivers.TaskEvent{
@@ -470,9 +508,11 @@ func (d *Driver) handleEvent(event api.LibvirtEvent) {
 		Timestamp: time.Now(),
 		Message:   fmt.Sprintf("domain state change %s, reason: %s\n", event.State, event.Reason),
 	})
+	d.logger.Debug("handleEvent returning")
 }
 
-func (d *Driver) statsLoop(ctx context.Context) {
+func (d *Driver) statsLoop() {
+	d.logger.Debug("statsLoop called")
 	for {
 		select {
 		case stat := <-d.domainStatsChan:
@@ -482,8 +522,9 @@ func (d *Driver) statsLoop(ctx context.Context) {
 				continue
 			}
 			h.HandleStat(stat)
-		case <-ctx.Done():
+		case <-d.ctx.Done():
 			// exiting
+			d.logger.Debug("breaking statsLoop")
 			return
 		}
 	}
