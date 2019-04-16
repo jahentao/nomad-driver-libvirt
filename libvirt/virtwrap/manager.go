@@ -17,8 +17,13 @@ import (
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/cli"
 	domainerrors "gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/util"
 )
+
+func init() {
+	// this must be called before doing anything else
+	// otherwise the registration will always fail with internal error "could not initialize domain event timer"
+	libvirt.EventRegisterDefaultImpl()
+}
 
 type DomainManager interface {
 	SyncVM(*drivers.TaskConfig, *api.TaskConfig) (*api.DomainSpec, error)
@@ -103,7 +108,6 @@ func (l *LibvirtDomainManager) SyncVM(cfg *drivers.TaskConfig, taskCfg *api.Task
 			l.logger.Debug("Creating the domain according to TaskConfig failed.")
 			return nil, err
 		}
-		// fmt.Println("Domain started.")
 	} else if cli.IsPaused(domState) {
 		// TODO: if state change reason indicates a system error, we could try something smarter
 		err := dom.Resume()
@@ -138,7 +142,13 @@ func (l *LibvirtDomainManager) setDomainSpec(spec *api.DomainSpec) (cli.VirDomai
 	if err != nil {
 		return nil, err
 	}
-	return util.SetDomainSpecStr(l.virConn, string(domainSpecXML))
+
+	dom, err := l.virConn.DomainDefineXML(string(domainSpecXML))
+	if err != nil {
+		fmt.Println("DomainDefineXML  failed.")
+		return nil, err
+	}
+	return dom, nil
 }
 
 // DomainIfAddr retrieves interface info from qemu guest agent
@@ -311,7 +321,7 @@ func (l *LibvirtDomainManager) VMState(domName string) (api.LifeCycle, error) {
 		}
 		return api.NoState, err
 	}
-	return util.ConvState(s), nil
+	return api.ConvState(s), nil
 
 }
 
@@ -331,8 +341,8 @@ func (l *LibvirtDomainManager) StartDomainMonitor(ctx context.Context) (<-chan a
 			}
 			return
 		}
-		apiState := util.ConvState(status)
-		apiReason := util.ConvReason(status, reason)
+		apiState := api.ConvState(status)
+		apiReason := api.ConvReason(status, reason)
 
 		metadata := &api.NomadMetaData{}
 		metadataXML, err := d.GetMetadata(libvirt.DOMAIN_METADATA_ELEMENT, "http://harmonycloud.cn", libvirt.DOMAIN_AFFECT_CONFIG)

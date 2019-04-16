@@ -52,7 +52,6 @@ type VirDomain interface {
 }
 
 func NewConnection(uri string, user string, pass string, checkInterval time.Duration) (Connection, error) {
-	// fmt.Printf("Connecting to libvirt daemon: %s\n", uri)
 
 	var err error
 	var virConn *libvirt.Connect
@@ -61,7 +60,6 @@ func NewConnection(uri string, user string, pass string, checkInterval time.Dura
 	if err != nil {
 		return nil, fmt.Errorf("cannot connect to libvirt daemon: %v", err)
 	}
-	// fmt.Println("Connected to libvirt daemon")
 
 	lvConn := &LibvirtConnection{
 		Connect: virConn, user: user, pass: pass, uri: uri, alive: true,

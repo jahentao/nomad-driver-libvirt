@@ -2,6 +2,8 @@ package api
 
 import (
 	"encoding/xml"
+
+	"github.com/libvirt/libvirt-go"
 )
 
 type LifeCycle string
@@ -54,6 +56,74 @@ const (
 
 	UserAliasPrefix = "ua-"
 )
+
+var LifeCycleTranslationMap = map[libvirt.DomainState]LifeCycle{
+	libvirt.DOMAIN_NOSTATE:     NoState,
+	libvirt.DOMAIN_RUNNING:     Running,
+	libvirt.DOMAIN_BLOCKED:     Blocked,
+	libvirt.DOMAIN_PAUSED:      Paused,
+	libvirt.DOMAIN_SHUTDOWN:    Shutdown,
+	libvirt.DOMAIN_SHUTOFF:     Shutoff,
+	libvirt.DOMAIN_CRASHED:     Crashed,
+	libvirt.DOMAIN_PMSUSPENDED: PMSuspended,
+}
+
+var ShutdownReasonTranslationMap = map[libvirt.DomainShutdownReason]StateChangeReason{
+	libvirt.DOMAIN_SHUTDOWN_UNKNOWN: ReasonUnknown,
+	libvirt.DOMAIN_SHUTDOWN_USER:    ReasonUser,
+}
+
+var ShutoffReasonTranslationMap = map[libvirt.DomainShutoffReason]StateChangeReason{
+	libvirt.DOMAIN_SHUTOFF_UNKNOWN:       ReasonUnknown,
+	libvirt.DOMAIN_SHUTOFF_SHUTDOWN:      ReasonShutdown,
+	libvirt.DOMAIN_SHUTOFF_DESTROYED:     ReasonDestroyed,
+	libvirt.DOMAIN_SHUTOFF_CRASHED:       ReasonCrashed,
+	libvirt.DOMAIN_SHUTOFF_MIGRATED:      ReasonMigrated,
+	libvirt.DOMAIN_SHUTOFF_SAVED:         ReasonSaved,
+	libvirt.DOMAIN_SHUTOFF_FAILED:        ReasonFailed,
+	libvirt.DOMAIN_SHUTOFF_FROM_SNAPSHOT: ReasonFromSnapshot,
+}
+
+var CrashedReasonTranslationMap = map[libvirt.DomainCrashedReason]StateChangeReason{
+	libvirt.DOMAIN_CRASHED_UNKNOWN:  ReasonUnknown,
+	libvirt.DOMAIN_CRASHED_PANICKED: ReasonPanicked,
+}
+
+var PausedReasonTranslationMap = map[libvirt.DomainPausedReason]StateChangeReason{
+	libvirt.DOMAIN_PAUSED_UNKNOWN:         ReasonPausedUnknown,
+	libvirt.DOMAIN_PAUSED_USER:            ReasonPausedUser,
+	libvirt.DOMAIN_PAUSED_MIGRATION:       ReasonPausedMigration,
+	libvirt.DOMAIN_PAUSED_SAVE:            ReasonPausedSave,
+	libvirt.DOMAIN_PAUSED_DUMP:            ReasonPausedDump,
+	libvirt.DOMAIN_PAUSED_IOERROR:         ReasonPausedIOError,
+	libvirt.DOMAIN_PAUSED_WATCHDOG:        ReasonPausedWatchdog,
+	libvirt.DOMAIN_PAUSED_FROM_SNAPSHOT:   ReasonPausedFromSnapshot,
+	libvirt.DOMAIN_PAUSED_SHUTTING_DOWN:   ReasonPausedShuttingDown,
+	libvirt.DOMAIN_PAUSED_SNAPSHOT:        ReasonPausedSnapshot,
+	libvirt.DOMAIN_PAUSED_CRASHED:         ReasonPausedCrashed,
+	libvirt.DOMAIN_PAUSED_STARTING_UP:     ReasonPausedStartingUp,
+	libvirt.DOMAIN_PAUSED_POSTCOPY:        ReasonPausedPostcopy,
+	libvirt.DOMAIN_PAUSED_POSTCOPY_FAILED: ReasonPausedPostcopyFailed,
+}
+
+func ConvState(status libvirt.DomainState) LifeCycle {
+	return LifeCycleTranslationMap[status]
+}
+
+func ConvReason(status libvirt.DomainState, reason int) StateChangeReason {
+	switch status {
+	case libvirt.DOMAIN_SHUTDOWN:
+		return ShutdownReasonTranslationMap[libvirt.DomainShutdownReason(reason)]
+	case libvirt.DOMAIN_SHUTOFF:
+		return ShutoffReasonTranslationMap[libvirt.DomainShutoffReason(reason)]
+	case libvirt.DOMAIN_CRASHED:
+		return CrashedReasonTranslationMap[libvirt.DomainCrashedReason(reason)]
+	case libvirt.DOMAIN_PAUSED:
+		return PausedReasonTranslationMap[libvirt.DomainPausedReason(reason)]
+	default:
+		return ReasonUnknown
+	}
+}
 
 type LibvirtEvent struct {
 	DomainName string

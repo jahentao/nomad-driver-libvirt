@@ -459,56 +459,18 @@ func (d *Driver) eventLoop() {
 	for {
 		select {
 		case event := <-d.domainEventChan:
-			d.handleEvent(event)
+			h, ok := d.tasks.Get(event.TaskID)
+			if !ok {
+				// silently drop domain event having no matching task
+				continue
+			}
+			d.eventer.EmitEvent(h.HandleEvent(event))
 		case <-d.ctx.Done():
 			// exiting
 			d.logger.Debug("breaking from eventLoop")
 			return
 		}
 	}
-}
-
-func (d *Driver) handleEvent(event api.LibvirtEvent) {
-	d.logger.Debug("handleEvent called")
-	h, ok := d.tasks.Get(event.TaskID)
-	if !ok {
-		return
-	}
-	d.logger.Debug("handling event for task", "job name", h.task.JobName, "allocid", h.task.AllocID, "taskid", h.task.ID)
-	switch event.State {
-	case api.Shutoff, api.Crashed:
-		exitCode := 0
-		if event.State == api.Crashed {
-			exitCode = -1
-		}
-		h.completedAt = time.Now().Round(time.Millisecond)
-		// domain stopped, notify task runner
-		// Only Shutoff and Crashed considered terminal state
-		// Other states including Blocked, Paused, ShuttingDown, PMSuspended considered temporary, only send event to task runner in these cases
-		// TODO is setting exitcode to -1 the correct way to signal a domain failure?
-		// TODO is it possible for a domain to be oom killed? how to detect that from libvirt domain event?
-		h.exitResult = &drivers.ExitResult{
-			ExitCode:  exitCode,
-			Signal:    0,
-			OOMKilled: false,
-			Err:       nil,
-		}
-		// someone called driver.WaitTask again after job stop command is issued
-		// so 2 people (this mysterious someone and task runner) are waiting for the exitresult here
-		// so I sendout 2 exitResult here
-		h.resultChan <- h.exitResult
-		h.resultChan <- h.exitResult
-		d.logger.Debug("exit result sent to resultChan", "exitResult", h.exitResult)
-	}
-	// send task event in any case
-	d.eventer.EmitEvent(&drivers.TaskEvent{
-		TaskID:    h.task.ID,
-		AllocID:   h.task.AllocID,
-		TaskName:  h.task.Name,
-		Timestamp: time.Now(),
-		Message:   fmt.Sprintf("domain state change %s, reason: %s\n", event.State, event.Reason),
-	})
-	d.logger.Debug("handleEvent returning")
 }
 
 func (d *Driver) statsLoop() {

@@ -2,6 +2,7 @@ package libvirt
 
 import (
 	"context"
+	"fmt"
 	"sync"
 	"time"
 
@@ -115,4 +116,38 @@ func (h *taskHandle) HandleStat(stat *stats.DomainStats) {
 		Timestamp: stat.Timestamp,
 	}
 	h.setResourceUsage(resourceUsage)
+}
+
+func (h *taskHandle) HandleEvent(event api.LibvirtEvent) *drivers.TaskEvent {
+	switch event.State {
+	case api.Shutoff, api.Crashed:
+		exitCode := 0
+		if event.State == api.Crashed {
+			exitCode = -1
+		}
+		h.completedAt = time.Now().Round(time.Millisecond)
+		// domain stopped, notify task runner
+		// Only Shutoff and Crashed considered terminal state
+		// Other states including Blocked, Paused, ShuttingDown, PMSuspended considered temporary, only send event to task runner in these cases
+		// TODO is setting exitcode to -1 the correct way to signal a domain failure?
+		// TODO is it possible for a domain to be oom killed? how to detect that from libvirt domain event?
+		h.exitResult = &drivers.ExitResult{
+			ExitCode:  exitCode,
+			Signal:    0,
+			OOMKilled: false,
+			Err:       nil,
+		}
+		// someone called driver.WaitTask again after job stop command is issued
+		// so 2 people (this mysterious someone and task runner) are waiting for the exitresult here
+		// so I sendout 2 exitResult here
+		h.resultChan <- h.exitResult
+		h.resultChan <- h.exitResult
+	}
+	return &drivers.TaskEvent{
+		TaskID:    h.task.ID,
+		AllocID:   h.task.AllocID,
+		TaskName:  h.task.Name,
+		Timestamp: time.Now(),
+		Message:   fmt.Sprintf("domain state change %s, reason: %s\n", event.State, event.Reason),
+	}
 }

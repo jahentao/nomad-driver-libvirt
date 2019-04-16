@@ -10,84 +10,8 @@ import (
 	"time"
 
 	hclog "github.com/hashicorp/go-hclog"
-	libvirt "github.com/libvirt/libvirt-go"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/cli"
 )
-
-func init() {
-	// this must be called before doing anything else
-	// otherwise the registration will always fail with internal error "could not initialize domain event timer"
-	libvirt.EventRegisterDefaultImpl()
-}
-
-var LifeCycleTranslationMap = map[libvirt.DomainState]api.LifeCycle{
-	libvirt.DOMAIN_NOSTATE:     api.NoState,
-	libvirt.DOMAIN_RUNNING:     api.Running,
-	libvirt.DOMAIN_BLOCKED:     api.Blocked,
-	libvirt.DOMAIN_PAUSED:      api.Paused,
-	libvirt.DOMAIN_SHUTDOWN:    api.Shutdown,
-	libvirt.DOMAIN_SHUTOFF:     api.Shutoff,
-	libvirt.DOMAIN_CRASHED:     api.Crashed,
-	libvirt.DOMAIN_PMSUSPENDED: api.PMSuspended,
-}
-
-var ShutdownReasonTranslationMap = map[libvirt.DomainShutdownReason]api.StateChangeReason{
-	libvirt.DOMAIN_SHUTDOWN_UNKNOWN: api.ReasonUnknown,
-	libvirt.DOMAIN_SHUTDOWN_USER:    api.ReasonUser,
-}
-
-var ShutoffReasonTranslationMap = map[libvirt.DomainShutoffReason]api.StateChangeReason{
-	libvirt.DOMAIN_SHUTOFF_UNKNOWN:       api.ReasonUnknown,
-	libvirt.DOMAIN_SHUTOFF_SHUTDOWN:      api.ReasonShutdown,
-	libvirt.DOMAIN_SHUTOFF_DESTROYED:     api.ReasonDestroyed,
-	libvirt.DOMAIN_SHUTOFF_CRASHED:       api.ReasonCrashed,
-	libvirt.DOMAIN_SHUTOFF_MIGRATED:      api.ReasonMigrated,
-	libvirt.DOMAIN_SHUTOFF_SAVED:         api.ReasonSaved,
-	libvirt.DOMAIN_SHUTOFF_FAILED:        api.ReasonFailed,
-	libvirt.DOMAIN_SHUTOFF_FROM_SNAPSHOT: api.ReasonFromSnapshot,
-}
-
-var CrashedReasonTranslationMap = map[libvirt.DomainCrashedReason]api.StateChangeReason{
-	libvirt.DOMAIN_CRASHED_UNKNOWN:  api.ReasonUnknown,
-	libvirt.DOMAIN_CRASHED_PANICKED: api.ReasonPanicked,
-}
-
-var PausedReasonTranslationMap = map[libvirt.DomainPausedReason]api.StateChangeReason{
-	libvirt.DOMAIN_PAUSED_UNKNOWN:         api.ReasonPausedUnknown,
-	libvirt.DOMAIN_PAUSED_USER:            api.ReasonPausedUser,
-	libvirt.DOMAIN_PAUSED_MIGRATION:       api.ReasonPausedMigration,
-	libvirt.DOMAIN_PAUSED_SAVE:            api.ReasonPausedSave,
-	libvirt.DOMAIN_PAUSED_DUMP:            api.ReasonPausedDump,
-	libvirt.DOMAIN_PAUSED_IOERROR:         api.ReasonPausedIOError,
-	libvirt.DOMAIN_PAUSED_WATCHDOG:        api.ReasonPausedWatchdog,
-	libvirt.DOMAIN_PAUSED_FROM_SNAPSHOT:   api.ReasonPausedFromSnapshot,
-	libvirt.DOMAIN_PAUSED_SHUTTING_DOWN:   api.ReasonPausedShuttingDown,
-	libvirt.DOMAIN_PAUSED_SNAPSHOT:        api.ReasonPausedSnapshot,
-	libvirt.DOMAIN_PAUSED_CRASHED:         api.ReasonPausedCrashed,
-	libvirt.DOMAIN_PAUSED_STARTING_UP:     api.ReasonPausedStartingUp,
-	libvirt.DOMAIN_PAUSED_POSTCOPY:        api.ReasonPausedPostcopy,
-	libvirt.DOMAIN_PAUSED_POSTCOPY_FAILED: api.ReasonPausedPostcopyFailed,
-}
-
-func ConvState(status libvirt.DomainState) api.LifeCycle {
-	return LifeCycleTranslationMap[status]
-}
-
-func ConvReason(status libvirt.DomainState, reason int) api.StateChangeReason {
-	switch status {
-	case libvirt.DOMAIN_SHUTDOWN:
-		return ShutdownReasonTranslationMap[libvirt.DomainShutdownReason(reason)]
-	case libvirt.DOMAIN_SHUTOFF:
-		return ShutoffReasonTranslationMap[libvirt.DomainShutoffReason(reason)]
-	case libvirt.DOMAIN_CRASHED:
-		return CrashedReasonTranslationMap[libvirt.DomainCrashedReason(reason)]
-	case libvirt.DOMAIN_PAUSED:
-		return PausedReasonTranslationMap[libvirt.DomainPausedReason(reason)]
-	default:
-		return api.ReasonUnknown
-	}
-}
 
 func SetupLibvirt(logger hclog.Logger) error {
 
@@ -235,15 +159,6 @@ func StartVirtlog(ctx context.Context) {
 			time.Sleep(time.Second)
 		}
 	}()
-}
-
-func SetDomainSpecStr(virConn cli.Connection, wantedSpec string) (cli.VirDomain, error) {
-	dom, err := virConn.DomainDefineXML(wantedSpec)
-	if err != nil {
-		fmt.Println("DomainDefineXML  failed.")
-		return nil, err
-	}
-	return dom, nil
 }
 
 func CreateLibvirtConnection() (cli.Connection, error) {
