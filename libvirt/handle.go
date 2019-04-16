@@ -47,30 +47,28 @@ func (h *taskHandle) buildState() *taskHandleState {
 	}
 }
 
-// Stats starts collecting stats from the docker daemon and sends them on the
-// returned channel.
 func (h *taskHandle) Stats(ctx context.Context, interval time.Duration) (<-chan *cstructs.TaskResourceUsage, error) {
 	ch := make(chan *cstructs.TaskResourceUsage)
 
-	go func(ctx context.Context, out chan *cstructs.TaskResourceUsage, interval time.Duration) {
+	go func() {
 		timer := time.NewTimer(interval)
 		for {
 			select {
 			case <-timer.C:
 				// out put resource usage
 				select {
-				case out <- h.getResourceUsage():
+				case ch <- h.getResourceUsage():
 				default:
 					//drop usage data if blocked
 				}
 				timer.Reset(interval)
 			case <-ctx.Done():
 				// close channel and return when done
-				close(out)
+				close(ch)
 				return
 			}
 		}
-	}(ctx, ch, interval)
+	}()
 
 	return ch, nil
 }
