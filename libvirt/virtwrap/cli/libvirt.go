@@ -99,25 +99,30 @@ func (l *LibvirtConnection) Close() (int, error) {
 	return l.Connect.Close()
 }
 
-func (l *LibvirtConnection) LookupDomainByName(name string) (dom VirDomain, err error) {
-	if err = l.reconnectIfNecessary(); err != nil {
-		return
+func (l *LibvirtConnection) LookupDomainByName(name string) (VirDomain, error) {
+	if err := l.reconnectIfNecessary(); err != nil {
+		return nil, err
 	}
 
 	domain, err := l.Connect.LookupDomainByName(name)
-	l.checkConnectionLost(err)
-	return domain, err
+	if err != nil {
+		l.checkConnectionLost(err)
+		return nil, err
+	}
+	return domain, nil
 }
 
-func (l *LibvirtConnection) reconnectIfNecessary() (err error) {
+func (l *LibvirtConnection) reconnectIfNecessary() error {
 	l.reconnectLock.Lock()
 	defer l.reconnectLock.Unlock()
 	// TODO add a reconnect backoff, and immediately return an error in these cases
 	// We need this to avoid swamping libvirt with reconnect tries
 	if !l.alive {
+		var err error
+
 		l.Connect, err = newConnection(l.uri, l.user, l.pass)
 		if err != nil {
-			return
+			return err
 		}
 		l.alive = true
 
@@ -131,14 +136,17 @@ func (l *LibvirtConnection) reconnectIfNecessary() (err error) {
 	return nil
 }
 
-func (l *LibvirtConnection) DomainDefineXML(xml string) (dom VirDomain, err error) {
-	if err = l.reconnectIfNecessary(); err != nil {
-		return
+func (l *LibvirtConnection) DomainDefineXML(xml string) (VirDomain, error) {
+	if err := l.reconnectIfNecessary(); err != nil {
+		return nil, err
 	}
 
-	dom, err = l.Connect.DomainDefineXML(xml)
-	l.checkConnectionLost(err)
-	return
+	dom, err := l.Connect.DomainDefineXML(xml)
+	if err != nil {
+		l.checkConnectionLost(err)
+		return nil, err
+	}
+	return dom, nil
 }
 
 func (l *LibvirtConnection) checkConnectionLost(err error) {
@@ -186,30 +194,30 @@ func IsPaused(domState libvirt.DomainState) bool {
 	return false
 }
 
-func (l *LibvirtConnection) DomainEventLifecycleRegister(callback libvirt.DomainEventLifecycleCallback) (err error) {
-	if err = l.reconnectIfNecessary(); err != nil {
-		return
+func (l *LibvirtConnection) DomainEventLifecycleRegister(callback libvirt.DomainEventLifecycleCallback) error {
+	if err := l.reconnectIfNecessary(); err != nil {
+		return err
 	}
 
-	_, err = l.Connect.DomainEventLifecycleRegister(nil, callback)
+	_, err := l.Connect.DomainEventLifecycleRegister(nil, callback)
 	if err != nil {
-		fmt.Printf("error when registering domain event call back: %+v\n", err)
+		l.checkConnectionLost(err)
+		return err
 	}
-	l.checkConnectionLost(err)
-	return
+	return nil
 }
 
-func (l *LibvirtConnection) AgentEventLifecycleRegister(callback libvirt.DomainEventAgentLifecycleCallback) (err error) {
-	if err = l.reconnectIfNecessary(); err != nil {
-		return
+func (l *LibvirtConnection) AgentEventLifecycleRegister(callback libvirt.DomainEventAgentLifecycleCallback) error {
+	if err := l.reconnectIfNecessary(); err != nil {
+		return err
 	}
 
-	_, err = l.Connect.DomainEventAgentLifecycleRegister(nil, callback)
+	_, err := l.Connect.DomainEventAgentLifecycleRegister(nil, callback)
 	if err != nil {
-		fmt.Printf("error when registering agent event call back: %+v\n", err)
+		l.checkConnectionLost(err)
+		return err
 	}
-	l.checkConnectionLost(err)
-	return
+	return nil
 }
 
 // Execute a command on the Qemu guest agent
