@@ -145,7 +145,7 @@ func (l *LibvirtDomainManager) setDomainSpec(spec *api.DomainSpec) (cli.VirDomai
 
 	dom, err := l.virConn.DomainDefineXML(string(domainSpecXML))
 	if err != nil {
-		fmt.Println("DomainDefineXML  failed.")
+		l.logger.Error("DomainDefineXML failed.")
 		return nil, err
 	}
 	return dom, nil
