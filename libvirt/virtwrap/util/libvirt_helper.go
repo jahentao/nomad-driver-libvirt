@@ -82,7 +82,7 @@ func StartLibvirt(ctx context.Context, logger hclog.Logger) {
 			// connect libvirt's stderr to our own stdout in order to see the logs in the container logs
 			reader, err := cmd.StderrPipe()
 			if err != nil {
-				logger.Error("failed to setup error pipe for libvirtd", "error", err)
+				fmt.Errorf("failed to setup error pipe for libvirtd: %v", err)
 				panic(err)
 			}
 
@@ -99,7 +99,7 @@ func StartLibvirt(ctx context.Context, logger hclog.Logger) {
 
 			err = cmd.Start()
 			if err != nil {
-				logger.Error("failed to start libvirtd", "error", err)
+				fmt.Errorf("failed to start libvirtd: %v", err)
 				panic(err)
 			}
 
@@ -136,7 +136,7 @@ func StartVirtlog(ctx context.Context) {
 
 			err := cmd.Start()
 			if err != nil {
-				fmt.Printf("failed to start virtlogd: %v\n", err)
+				fmt.Errorf("failed to start virtlogd: %v", err)
 				panic(err)
 			}
 
@@ -147,11 +147,9 @@ func StartVirtlog(ctx context.Context) {
 
 			select {
 			case <-ctx.Done():
-				fmt.Println("context done, killing virlogd")
 				cmd.Process.Kill()
 				return
 			case <-exitChan:
-				fmt.Println("virlogd exited, restarting")
 			}
 
 			// this sleep is to avoid consumming all resources in the
