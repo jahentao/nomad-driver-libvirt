@@ -199,6 +199,7 @@ func (d *Driver) Fingerprint(ctx context.Context) (<-chan *drivers.Fingerprint, 
 }
 
 func (d *Driver) handleFingerprint(ctx context.Context, ch chan *drivers.Fingerprint) {
+	d.logger.Debug("handleFingerpring called")
 	defer close(ch)
 	ticker := time.NewTimer(0)
 	for {
