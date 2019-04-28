@@ -3,9 +3,7 @@ package libvirt
 import (
 	"context"
 	"fmt"
-	"os/exec"
 	"regexp"
-	"strings"
 	"sync"
 	"time"
 
@@ -222,27 +220,10 @@ func (d *Driver) buildFingerprint() *drivers.Fingerprint {
 		HealthDescription: drivers.DriverHealthy,
 	}
 
-	bin := "virsh"
-
-	outBytes, err := exec.Command(bin, "--version").Output()
-	if err != nil {
-		// return no error, as it isn't an error to not find qemu, it just means we
-		// can't use it.
-		fingerprint.Health = drivers.HealthStateUndetected
-		fingerprint.HealthDescription = ""
-		return fingerprint
+	if err := domainConn.ReconnectIfNecessary(); err != nil {
+		fingerprint.Health = drivers.HealthStateUnhealthy
+		fingerprint.HealthDescription = "libvirt connection lost"
 	}
-	out := strings.TrimSpace(string(outBytes))
-
-	matches := libvirtVersionRegex.FindStringSubmatch(out)
-	if len(matches) != 1 {
-		fingerprint.Health = drivers.HealthStateUndetected
-		fingerprint.HealthDescription = fmt.Sprintf("Failed to parse libvirt version from %v", out)
-		return fingerprint
-	}
-
-	fingerprint.Attributes[driverAttr] = pstructs.NewBoolAttribute(true)
-	fingerprint.Attributes[driverVersionAttr] = pstructs.NewStringAttribute(matches[0])
 	return fingerprint
 }
 

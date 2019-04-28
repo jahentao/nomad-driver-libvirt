@@ -20,6 +20,7 @@ type Connection interface {
 	QemuAgentCommand(command string, domainName string) (string, error)
 	SetReconnectChan(reconnect chan bool)
 	GetDomainStats(statsTypes libvirt.DomainStatsTypes, flags libvirt.ConnectGetAllDomainStatsFlags) ([]*stats.DomainStats, error)
+	ReconnectIfNecessary() error
 }
 
 type LibvirtConnection struct {
@@ -100,7 +101,7 @@ func (l *LibvirtConnection) Close() (int, error) {
 }
 
 func (l *LibvirtConnection) LookupDomainByName(name string) (VirDomain, error) {
-	if err := l.reconnectIfNecessary(); err != nil {
+	if err := l.ReconnectIfNecessary(); err != nil {
 		return nil, err
 	}
 
@@ -112,7 +113,7 @@ func (l *LibvirtConnection) LookupDomainByName(name string) (VirDomain, error) {
 	return domain, nil
 }
 
-func (l *LibvirtConnection) reconnectIfNecessary() error {
+func (l *LibvirtConnection) ReconnectIfNecessary() error {
 	l.reconnectLock.Lock()
 	defer l.reconnectLock.Unlock()
 	// TODO add a reconnect backoff, and immediately return an error in these cases
@@ -137,7 +138,7 @@ func (l *LibvirtConnection) reconnectIfNecessary() error {
 }
 
 func (l *LibvirtConnection) DomainDefineXML(xml string) (VirDomain, error) {
-	if err := l.reconnectIfNecessary(); err != nil {
+	if err := l.ReconnectIfNecessary(); err != nil {
 		return nil, err
 	}
 
@@ -195,7 +196,7 @@ func IsPaused(domState libvirt.DomainState) bool {
 }
 
 func (l *LibvirtConnection) DomainEventLifecycleRegister(callback libvirt.DomainEventLifecycleCallback) error {
-	if err := l.reconnectIfNecessary(); err != nil {
+	if err := l.ReconnectIfNecessary(); err != nil {
 		return err
 	}
 
@@ -208,7 +209,7 @@ func (l *LibvirtConnection) DomainEventLifecycleRegister(callback libvirt.Domain
 }
 
 func (l *LibvirtConnection) AgentEventLifecycleRegister(callback libvirt.DomainEventAgentLifecycleCallback) error {
-	if err := l.reconnectIfNecessary(); err != nil {
+	if err := l.ReconnectIfNecessary(); err != nil {
 		return err
 	}
 
@@ -263,7 +264,7 @@ func (l *LibvirtConnection) GetDomainStats(statsTypes libvirt.DomainStatsTypes, 
 }
 
 func (l *LibvirtConnection) GetAllDomainStats(statsTypes libvirt.DomainStatsTypes, flags libvirt.ConnectGetAllDomainStatsFlags) ([]libvirt.DomainStats, error) {
-	if err := l.reconnectIfNecessary(); err != nil {
+	if err := l.ReconnectIfNecessary(); err != nil {
 		return nil, err
 	}
 
