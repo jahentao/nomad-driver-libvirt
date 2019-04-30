@@ -17,7 +17,6 @@ import (
 	pstructs "github.com/hashicorp/nomad/plugins/shared/structs"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/cli"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/util"
 )
@@ -79,9 +78,6 @@ var (
 	// libvirt domain manager, singleton
 	domainManager virtwrap.DomainManager
 
-	// libvirt connection, singleton
-	domainConn cli.Connection
-
 	// driver singleton
 	driver *Driver
 
@@ -128,9 +124,8 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 		// }
 		// util.StartLibvirt(ctx, logger)
 		// util.StartVirtlog(ctx)
-		var err error
 
-		domainConn, err = util.CreateLibvirtConnection()
+		domainConn, err := util.CreateLibvirtConnection()
 		if err != nil {
 			return
 		}
@@ -221,7 +216,7 @@ func (d *Driver) buildFingerprint() *drivers.Fingerprint {
 		HealthDescription: drivers.DriverHealthy,
 	}
 
-	if err := domainConn.ReconnectIfNecessary(); err != nil {
+	if domainManager.IsManagerAlive() == false {
 		fingerprint.Health = drivers.HealthStateUnhealthy
 		fingerprint.HealthDescription = "libvirt connection lost"
 	}

@@ -33,6 +33,7 @@ type DomainManager interface {
 	DomainIfAddr(string, bool) (*api.GuestInterface, error)
 	StartDomainMonitor(context.Context) (<-chan api.LibvirtEvent, error)
 	StartDomainStatsColloction(context.Context, time.Duration) (<-chan *stats.DomainStats, error)
+	IsManagerAlive() bool
 }
 
 var _ DomainManager = &LibvirtDomainManager{}
@@ -434,4 +435,12 @@ func (l *LibvirtDomainManager) collectRunningDomainStats(statsChan chan *stats.D
 	for _, stat := range stats {
 		statsChan <- stat
 	}
+}
+
+func (l *LibvirtDomainManager) IsManagerAlive() bool {
+	if l.virConn.ReconnectIfNecessary() == nil {
+		return true
+	}
+
+	return false
 }
