@@ -128,8 +128,9 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 		// }
 		// util.StartLibvirt(ctx, logger)
 		// util.StartVirtlog(ctx)
+		var err error
 
-		domainConn, err := util.CreateLibvirtConnection()
+		domainConn, err = util.CreateLibvirtConnection()
 		if err != nil {
 			return
 		}
