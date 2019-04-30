@@ -4,7 +4,6 @@ set -o errexit
 
 build_locally() {
   DEST="pkg/linux_amd64"
-  PLUGDIR="/opt/nomad/data/plugins"
   NAME="nomad-driver-libvirt"
 
   mkdir -p "${DEST}"
@@ -13,10 +12,6 @@ build_locally() {
   go build -o "${DEST}/${NAME}" .
 
   echo "binary is present in ${DEST}/${NAME}"
-
-  cp "${DEST}/${NAME}" "${PLUGDIR}/"
-  echo
-  echo "binary is also copied to ${PLUGDIR}/${NAME}"
 }
 
 case "${OSTYPE}" in
