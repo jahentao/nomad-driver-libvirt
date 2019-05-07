@@ -529,7 +529,7 @@ func SetDefaultsDomainSpec(domainSpec *DomainSpec) {
 	if domainSpec.Features == nil {
 		domainSpec.Features = setDefaultFeatures()
 	}
-	domainSpec.OS.Type = SetDefaultsOSType()
+	setDefaultsOSType(&domainSpec.OS.Type)
 
 	console, serial := setDefaultConsoleSerial()
 	domainSpec.Devices.Consoles = append(domainSpec.Devices.Consoles, console)
@@ -566,10 +566,15 @@ func setDefaultFeatures() *Features {
 	return features
 }
 
-// SetDefaultsOSType set default ostype
-func SetDefaultsOSType() OSType {
-	ostype := OSType{}
-	ostype.OS = "hvm"
+// setDefaultsOSType set default ostype
+func setDefaultsOSType(ostype *OSType) {
+	if ostype == nil {
+		return
+	}
+
+	if ostype.OS == "" {
+		ostype.OS = "hvm"
+	}
 
 	if ostype.Arch == "" {
 		ostype.Arch = "x86_64"
@@ -580,8 +585,6 @@ func SetDefaultsOSType() OSType {
 	if ostype.Machine == "" {
 		ostype.Machine = "q35"
 	}
-
-	return ostype
 }
 
 // setDefaultConsoleSerial set default console and serial so that you can connect to a domain via virsh console
