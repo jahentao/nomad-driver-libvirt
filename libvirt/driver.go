@@ -79,7 +79,8 @@ var (
 	domainManager virtwrap.DomainManager
 
 	// driver singleton
-	driver *Driver
+	// initialized with empty struct so that nomad won't panic if libvirt initialization fails
+	driver *Driver = &Driver{}
 
 	// init once
 	initOnce sync.Once
@@ -125,6 +126,12 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 		// util.StartLibvirt(ctx, logger)
 		// util.StartVirtlog(ctx)
 
+		// initialize what we can, even when libvirt initialization fails
+		driver.logger = logger
+		driver.eventer = eventer.NewEventer(ctx, logger)
+		driver.ctx = ctx
+		driver.signalShutdown = cancel
+
 		domainConn, err := util.CreateLibvirtConnection()
 		if err != nil {
 			return
@@ -145,15 +152,9 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 			return
 		}
 
-		driver = &Driver{
-			eventer:         eventer.NewEventer(ctx, logger),
-			tasks:           newTaskStore(),
-			ctx:             ctx,
-			signalShutdown:  cancel,
-			domainEventChan: eventChan,
-			domainStatsChan: statsChan,
-			logger:          logger,
-		}
+		driver.tasks = newTaskStore()
+		driver.domainEventChan = eventChan
+		driver.domainStatsChan = statsChan
 
 		// start the domain event loop
 		go driver.eventLoop()
@@ -216,9 +217,9 @@ func (d *Driver) buildFingerprint() *drivers.Fingerprint {
 		HealthDescription: drivers.DriverHealthy,
 	}
 
-	if domainManager.IsManagerAlive() == false {
+	if domainManager == nil || domainManager.IsManagerAlive() == false {
 		fingerprint.Health = drivers.HealthStateUnhealthy
-		fingerprint.HealthDescription = "libvirt connection lost"
+		fingerprint.HealthDescription = "no libvirt connection"
 	}
 	return fingerprint
 }
