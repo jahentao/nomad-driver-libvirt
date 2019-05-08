@@ -83,7 +83,7 @@ func (l *LibvirtDomainManager) SyncVM(cfg *drivers.TaskConfig, taskCfg *api.Task
 	}
 
 	// To make sure, that we set the right qemu wrapper arguments,
-	// we update the domain XML whenever a VirtualMachineInstance was already defined but not running
+	// we update the domain XML whenever a domain was already defined but not running
 	if !newDomain && cli.IsDown(domState) {
 		uuid, err := dom.GetUUIDString()
 		if err != nil {
@@ -125,7 +125,7 @@ func (l *LibvirtDomainManager) SyncVM(cfg *drivers.TaskConfig, taskCfg *api.Task
 		l.logger.Debug("domain already running or pmsuspended, won't start or resume it here")
 	}
 
-	// TODO: check if VirtualMachineInstance Spec and Domain Spec are equal or if we have to sync
+	// TODO: check if Spec and Domain Spec are equal or if we have to sync
 	return spec, nil
 }
 
@@ -241,7 +241,7 @@ func (l *LibvirtDomainManager) KillVM(domainName string) error {
 
 	dom, err := l.virConn.LookupDomainByName(domainName)
 	if err != nil {
-		// If the VirtualMachineInstance does not exist, we are done
+		// If the domain does not exist, we are done
 		if domainerrors.IsNotFound(err) {
 			return drivers.ErrTaskNotFound
 		} else {

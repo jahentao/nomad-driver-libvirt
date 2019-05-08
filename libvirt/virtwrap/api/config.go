@@ -49,7 +49,7 @@ type CPUConfig struct {
 	// Defaults to host-model.
 	// +optional
 	Model string `codec:"model"`
-	// DedicatedCPUPlacement requests the scheduler to place the VirtualMachineInstance on a node
+	// DedicatedCPUPlacement requests the scheduler to place the domain on a node
 	// with enough dedicated pCPUs and pin the vCPUs to it.
 	// +optional
 	DedicatedCPUPlacement bool `codec:"dedicated_cpu_placement"`
