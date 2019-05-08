@@ -73,10 +73,8 @@ var (
 		FSIsolation: drivers.FSIsolationImage,
 	}
 
+	// interface compatibility check
 	_ drivers.DriverPlugin = (*Driver)(nil)
-
-	// libvirt domain manager, singleton
-	domainManager virtwrap.DomainManager
 
 	// driver singleton
 	// initialized with empty struct so that nomad won't panic if libvirt initialization fails
@@ -100,6 +98,9 @@ type Driver struct {
 
 	// tasks is the in memory datastore mapping taskIDs to taskHandles
 	tasks *taskStore
+
+	// libvirt domain manager
+	domainManager virtwrap.DomainManager
 
 	// domain event channel
 	domainEventChan <-chan api.LibvirtEvent
@@ -137,7 +138,7 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 			return
 		}
 
-		domainManager, err = virtwrap.NewLibvirtDomainManager(domainConn, logger)
+		domainManager, err := virtwrap.NewLibvirtDomainManager(domainConn, logger)
 		if err != nil {
 			return
 		}
@@ -153,6 +154,7 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 		}
 
 		driver.tasks = newTaskStore()
+		driver.domainManager = domainManager
 		driver.domainEventChan = eventChan
 		driver.domainStatsChan = statsChan
 
@@ -217,7 +219,7 @@ func (d *Driver) buildFingerprint() *drivers.Fingerprint {
 		HealthDescription: drivers.DriverHealthy,
 	}
 
-	if domainManager == nil || domainManager.IsManagerAlive() == false {
+	if d.domainManager == nil || d.domainManager.IsManagerAlive() == false {
 		fingerprint.Health = drivers.HealthStateUnhealthy
 		fingerprint.HealthDescription = "no libvirt connection"
 	}
@@ -243,11 +245,12 @@ func (d *Driver) RecoverTask(handle *drivers.TaskHandle) error {
 	// libvirt doesn't track the creation/compeltion time of domains
 	// so I'm tracking those myself
 	h := &taskHandle{
-		resultChan:  make(chan *drivers.ExitResult),
-		task:        handle.Config,
-		startedAt:   handleState.startedAt,
-		completedAt: handleState.completedAt,
-		exitResult:  handleState.exitResult,
+		domainManager: d.domainManager,
+		resultChan:    make(chan *drivers.ExitResult),
+		task:          handle.Config,
+		startedAt:     handleState.startedAt,
+		completedAt:   handleState.completedAt,
+		exitResult:    handleState.exitResult,
 	}
 
 	// set the in memory handle in task store
@@ -274,18 +277,18 @@ func (d *Driver) StartTask(cfg *drivers.TaskConfig) (*drivers.TaskHandle, *drive
 	handle.Config = cfg
 
 	// define and start domain
-	domainSpec, err := domainManager.SyncVM(cfg, &taskConfig)
+	domainSpec, err := d.domainManager.SyncVM(cfg, &taskConfig)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	// Detect domain address
 	// stop and undefine domain if can't get ipv4 address
-	guestIf, err := domainManager.DomainIfAddr(domainSpec.Name, true)
+	guestIf, err := d.domainManager.DomainIfAddr(domainSpec.Name, true)
 	if err != nil {
 		d.logger.Error("error getting domain address waiting for ipv4 addr", "error", err)
-		domainManager.KillVM(domainSpec.Name)
-		domainManager.DestroyVM(domainSpec.Name)
+		d.domainManager.KillVM(domainSpec.Name)
+		d.domainManager.DestroyVM(domainSpec.Name)
 		return nil, nil, err
 	}
 
@@ -308,10 +311,11 @@ func (d *Driver) StartTask(cfg *drivers.TaskConfig) (*drivers.TaskHandle, *drive
 
 	// Return a driver handle
 	h := &taskHandle{
-		resultChan: make(chan *drivers.ExitResult),
-		task:       cfg, //contains taskid allocid for future use
-		startedAt:  time.Now().Round(time.Millisecond),
-		net:        drvNet,
+		domainManager: d.domainManager,
+		resultChan:    make(chan *drivers.ExitResult),
+		task:          cfg, //contains taskid allocid for future use
+		startedAt:     time.Now().Round(time.Millisecond),
+		net:           drvNet,
 		resourceUsage: &cstructs.TaskResourceUsage{
 			ResourceUsage: &cstructs.ResourceUsage{
 				MemoryStats: &cstructs.MemoryStats{},
@@ -382,7 +386,7 @@ func (d *Driver) InspectTask(taskID string) (*drivers.TaskStatus, error) {
 
 	status.State = drivers.TaskStateUnknown
 
-	s, err := domainManager.VMState(api.TaskID2DomainName(h.task.ID))
+	s, err := d.domainManager.VMState(api.TaskID2DomainName(h.task.ID))
 	if err != nil {
 		return nil, err
 	}

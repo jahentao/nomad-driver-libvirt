@@ -9,11 +9,13 @@ import (
 	cstructs "github.com/hashicorp/nomad/client/structs"
 	cpustats "github.com/hashicorp/nomad/helper/stats"
 	"github.com/hashicorp/nomad/plugins/drivers"
+	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 )
 
 type taskHandle struct {
+	domainManager     virtwrap.DomainManager
 	resultChan        chan *drivers.ExitResult
 	task              *drivers.TaskConfig
 	startedAt         time.Time
@@ -32,11 +34,11 @@ type taskHandleState struct {
 }
 
 func (h *taskHandle) KillVM() error {
-	return domainManager.KillVM(api.TaskID2DomainName(h.task.ID))
+	return h.domainManager.KillVM(api.TaskID2DomainName(h.task.ID))
 }
 
 func (h *taskHandle) DestroyVM() error {
-	return domainManager.DestroyVM(api.TaskID2DomainName(h.task.ID))
+	return h.domainManager.DestroyVM(api.TaskID2DomainName(h.task.ID))
 }
 
 func (h *taskHandle) buildState() *taskHandleState {
