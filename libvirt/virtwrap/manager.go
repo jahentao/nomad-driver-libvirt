@@ -347,9 +347,13 @@ func (l *LibvirtDomainManager) StartDomainMonitor(ctx context.Context) (<-chan a
 
 		metadata := &api.NomadMetaData{}
 		metadataXML, err := d.GetMetadata(libvirt.DOMAIN_METADATA_ELEMENT, "http://harmonycloud.cn", libvirt.DOMAIN_AFFECT_CONFIG)
+		if err != nil {
+			// silently ignore domains with empty metadata
+			return
+		}
 		err = xml.Unmarshal([]byte(metadataXML), metadata)
 		if err != nil {
-			l.logger.Error("failed to unmarshal domain metadata", "error", err)
+			l.logger.Error("metadata found with invalid format", "error", err)
 			return
 		}
 		if metadata.TaskID == "" {

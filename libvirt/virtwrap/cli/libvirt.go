@@ -7,6 +7,7 @@ import (
 
 	libvirt "github.com/libvirt/libvirt-go"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
+	domainerrors "gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/statsconv"
 )
@@ -242,16 +243,24 @@ func (l *LibvirtConnection) GetDomainStats(statsTypes libvirt.DomainStatsTypes, 
 
 	var list []*stats.DomainStats
 	for _, domStat := range domStats {
-		var err error
 
 		memStats, err := domStat.Domain.MemoryStats(uint32(libvirt.DOMAIN_MEMORY_STAT_NR), 0)
 		if err != nil {
+			// stop parsing domain stats if error encountered
 			return list, err
 		}
 
 		stat := &stats.DomainStats{}
 		stat.Timestamp = time.Now().UnixNano()
 		err = statsconv.Convert_libvirt_DomainStats_to_stats_DomainStats(domStat.Domain, &domStat, memStats, stat)
+		if err == domainerrors.EmptyDomainMeta {
+			// silently drop domain stats conversion error for domains not created by us
+			continue
+		} else if err != nil {
+			// stop parsing domain stats if other error found, e.g. invalid metadata format or empty TaskID
+			return list, err
+		}
+
 		if err != nil {
 			return list, err
 		}

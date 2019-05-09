@@ -1,10 +1,15 @@
 package errors
 
 import (
+	"errors"
 	"fmt"
 
 	libvirt "github.com/libvirt/libvirt-go"
 )
+
+var NoTaskIDInDomainMeta = errors.New("no TaskID in domain metadata")
+var InvalidFormatDomainMeta = errors.New("invalid format domain metadata")
+var EmptyDomainMeta = errors.New("no meta data found in namespace harmonycloud")
 
 func checkError(err error, expectedError libvirt.ErrorNumber) bool {
 	libvirtError, ok := err.(libvirt.Error)

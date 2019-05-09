@@ -2,11 +2,11 @@ package statsconv
 
 import (
 	"encoding/xml"
-	"fmt"
 
 	"github.com/libvirt/libvirt-go"
 
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
+	domainerrors "gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 )
 
@@ -24,14 +24,19 @@ func Convert_libvirt_DomainStats_to_stats_DomainStats(domain *libvirt.Domain, in
 
 	metadata := &api.NomadMetaData{}
 	metadataXML, err := domain.GetMetadata(libvirt.DOMAIN_METADATA_ELEMENT, "http://harmonycloud.cn", libvirt.DOMAIN_AFFECT_CONFIG)
+	if err != nil {
+		// empty metadata in namespace harmonycloud, it's not created by us
+		return domainerrors.EmptyDomainMeta
+	}
 	err = xml.Unmarshal([]byte(metadataXML), metadata)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshal domain metadata, %+v", err)
+		return domainerrors.InvalidFormatDomainMeta
 	}
 	if metadata.TaskID == "" {
-		// domain created by us must have taskid as metadata
-		return fmt.Errorf("empty taskid for domain %s", name)
+		// domain created by us must have taskid as metadata, someone changed metadata format?
+		return domainerrors.NoTaskIDInDomainMeta
 	}
+
 	out.TaskID = metadata.TaskID
 
 	out.Cpu = Convert_libvirt_DomainStatsCpu_To_stats_DomainStatsCpu(in.Cpu)
