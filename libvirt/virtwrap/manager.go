@@ -31,7 +31,7 @@ type DomainManager interface {
 	DestroyVM(string) error
 	VMState(string) (api.LifeCycle, error)
 	DomainIfAddr(string, bool) (*api.GuestInterface, error)
-	StartDomainMonitor(context.Context) (<-chan api.LibvirtEvent, error)
+	StartDomainEventMonitor(context.Context) (<-chan api.LibvirtEvent, error)
 	StartDomainStatsColloction(context.Context, time.Duration) (<-chan *stats.DomainStats, error)
 	IsManagerAlive() bool
 }
@@ -326,7 +326,7 @@ func (l *LibvirtDomainManager) VMState(domName string) (api.LifeCycle, error) {
 
 }
 
-func (l *LibvirtDomainManager) StartDomainMonitor(ctx context.Context) (<-chan api.LibvirtEvent, error) {
+func (l *LibvirtDomainManager) StartDomainEventMonitor(ctx context.Context) (<-chan api.LibvirtEvent, error) {
 	eventChan := make(chan api.LibvirtEvent, 10)
 
 	domainEventLifecycleCallback := func(c *libvirt.Connect, d *libvirt.Domain, event *libvirt.DomainEventLifecycle) {

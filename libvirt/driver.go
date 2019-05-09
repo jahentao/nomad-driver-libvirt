@@ -143,7 +143,7 @@ func NewLibvirtDriver(logger hclog.Logger) drivers.DriverPlugin {
 			return
 		}
 
-		eventChan, err := domainManager.StartDomainMonitor(ctx)
+		eventChan, err := domainManager.StartDomainEventMonitor(ctx)
 		if err != nil {
 			return
 		}
