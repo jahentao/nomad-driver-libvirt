@@ -3,6 +3,7 @@ package libvirt
 import (
 	"context"
 	"fmt"
+	"os"
 	"sync"
 	"time"
 
@@ -13,6 +14,12 @@ import (
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
 	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 )
+
+func init() {
+	if err := cpustats.Init(); err != nil {
+		os.Exit(-1)
+	}
+}
 
 type taskHandle struct {
 	domainManager     virtwrap.DomainManager
