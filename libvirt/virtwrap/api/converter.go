@@ -448,6 +448,8 @@ func setDiskSpec(cfg *DiskConfig, devicePerBus map[string]int) (Disk, error) {
 		//only support file type disk now
 		if cfg.Type == "file" {
 			disk.Source = DiskSource{File: cfg.Source}
+		} else if cfg.Type == "block" {
+			disk.Source = DiskSource{Dev: cfg.Source}
 		}
 	case "lun":
 		disk.Device = "lun"
@@ -474,6 +476,8 @@ func setDiskSpec(cfg *DiskConfig, devicePerBus map[string]int) (Disk, error) {
 	}
 	if cfg.Type == "file" {
 		disk.Driver.Type = "qcow2"
+	} else if cfg.Type == "block" {
+		disk.Driver.Type = "raw"
 	}
 
 	return disk, nil
