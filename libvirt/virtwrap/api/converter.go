@@ -405,6 +405,14 @@ func ConvertTaskConfigToDomainSpec(cfg *drivers.TaskConfig, taskCfg *TaskConfig,
 		}
 	}
 
+	for _, deviceCfg := range taskCfg.HostDevices {
+		if newHostDevice, err := setHostDeviceSpec(&deviceCfg); err == nil {
+			domainSpec.Devices.HostDevices = append(domainSpec.Devices.HostDevices, newHostDevice)
+		} else {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -481,6 +489,27 @@ func setDiskSpec(cfg *DiskConfig, devicePerBus map[string]int) (Disk, error) {
 	}
 
 	return disk, nil
+}
+
+func setHostDeviceSpec(cfg *HostDeviceConfig) (HostDevice, error) {
+	if cfg == nil {
+		return HostDevice{}, fmt.Errorf("HostDevice config cannot be nil")
+	}
+
+	hostDevice := HostDevice{}
+	switch cfg.Type {
+	case "pci":
+		hostDevice.Type = cfg.Type
+		hostDevice.Managed = cfg.Managed
+		hostDevice.Source.Address = &Address{
+			Domain:   cfg.Domain,
+			Bus:      cfg.Bus,
+			Slot:     cfg.Slot,
+			Function: cfg.Function,
+		}
+	}
+	return hostDevice, nil
+
 }
 
 func makeDeviceName(bus string, devicePerBus map[string]int) string {
