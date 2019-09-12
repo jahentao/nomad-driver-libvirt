@@ -7,13 +7,14 @@ import (
 )
 
 type TaskConfig struct {
-	Name       string            `codec:"name"`
-	Memory     MemoryConfig      `codec:"memory"`
-	VCPU       uint32            `codec:"vcpu"`
-	CPU        CPUConfig         `codec:"cpu"`
-	Disks      []DiskConfig      `codec:"disks"`
-	Machine    string            `codec:"machine"`
-	Interfaces []InterfaceConfig `codec:"interfaces"`
+	Name        string             `codec:"name"`
+	Memory      MemoryConfig       `codec:"memory"`
+	VCPU        uint32             `codec:"vcpu"`
+	CPU         CPUConfig          `codec:"cpu"`
+	Disks       []DiskConfig       `codec:"disks"`
+	Machine     string             `codec:"machine"`
+	Interfaces  []InterfaceConfig  `codec:"interfaces"`
+	HostDevices []HostDeviceConfig `codec:"hostdevices"`
 }
 
 type MemoryConfig struct {
@@ -82,6 +83,15 @@ type InterfaceConfig struct {
 	SourceName string `codec:"source_name"`
 }
 
+type HostDeviceConfig struct {
+	Type     string `codec:"type"`
+	Managed  string `codec:"managed"`
+	Domain   string `codec:"domain"`
+	Bus      string `codec:"bus"`
+	Slot     string `codec:"slot"`
+	Function string `codec:"function"`
+}
+
 func (t *TaskConfig) ToLower() {
 	for idx, i := range t.Interfaces {
 		if i.InterfaceBindingMethod != "" {
@@ -126,5 +136,13 @@ var TaskConfigSpec = hclspec.NewObject(map[string]*hclspec.Spec{
 		"boot_order":               hclspec.NewAttr("boot_order", "number", false),
 		"pci_address":              hclspec.NewAttr("pci_address", "string", false),
 		"source_name":              hclspec.NewAttr("source_name", "string", false),
+	})),
+	"hostdevices": hclspec.NewBlockSet("hostdevices", hclspec.NewObject(map[string]*hclspec.Spec{
+		"type":     hclspec.NewAttr("type", "string", false),
+		"managed":  hclspec.NewAttr("managed", "string", false),
+		"domain":   hclspec.NewAttr("domain", "string", false),
+		"bus":      hclspec.NewAttr("bus", "string", false),
+		"slot":     hclspec.NewAttr("slot", "string", false),
+		"function": hclspec.NewAttr("function", "string", false),
 	})),
 })
