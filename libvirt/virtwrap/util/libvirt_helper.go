@@ -9,8 +9,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/cli"
+
 	hclog "github.com/hashicorp/go-hclog"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/cli"
 )
 
 func SetupLibvirt(logger hclog.Logger) error {

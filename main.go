@@ -1,9 +1,9 @@
 package main
 
 import (
-	log "github.com/hashicorp/go-hclog"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt"
 
+	log "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/nomad/plugins"
 )
 
@@ -12,7 +12,7 @@ func main() {
 	plugins.Serve(factory)
 }
 
-// factory returns a new instance of the LXC driver plugin
+// factory returns a new instance of the Nomad libvirt driver plugin
 func factory(log log.Logger) interface{} {
 	return libvirt.NewLibvirtDriver(log)
 }

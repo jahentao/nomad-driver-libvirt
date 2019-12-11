@@ -7,6 +7,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/api"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/stats"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/util"
+
 	hclog "github.com/hashicorp/go-hclog"
 	cstructs "github.com/hashicorp/nomad/client/structs"
 	"github.com/hashicorp/nomad/drivers/shared/eventer"
@@ -15,10 +20,6 @@ import (
 	"github.com/hashicorp/nomad/plugins/drivers"
 	"github.com/hashicorp/nomad/plugins/shared/hclspec"
 	pstructs "github.com/hashicorp/nomad/plugins/shared/structs"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/util"
 )
 
 const (

@@ -10,13 +10,14 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/api"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/cli"
+	domainerrors "github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/errors"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/stats"
+
 	hclog "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/nomad/plugins/drivers"
 	libvirt "github.com/libvirt/libvirt-go"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/cli"
-	domainerrors "gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 )
 
 func init() {
@@ -168,7 +169,7 @@ func (l *LibvirtDomainManager) DomainIfAddr(name string, wait4ipv4 bool) (*api.G
 	defer dom.Free()
 
 	attempt := 0
-	const MAX_ATTEMPT = 10
+	const MAX_ATTEMPT = 20
 	var virtErrRegExp = regexp.MustCompile("Code=(\\d+),")
 	nonLoFound := false
 
@@ -177,7 +178,6 @@ func (l *LibvirtDomainManager) DomainIfAddr(name string, wait4ipv4 bool) (*api.G
 		var err error
 		result, err := dom.QemuAgentCommand("{\"execute\":\"guest-network-get-interfaces\"}", libvirt.DOMAIN_QEMU_AGENT_COMMAND_DEFAULT, uint32(0))
 		if err != nil {
-			l.logger.Debug("error from qemu agent command", "err", err)
 			matchs := virtErrRegExp.FindStringSubmatch(err.Error())
 			if len(matchs) == 2 {
 				if i, err := strconv.Atoi(matchs[1]); err == nil {

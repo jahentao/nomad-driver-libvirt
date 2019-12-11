@@ -5,11 +5,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/errors"
+	domainerrors "github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/errors"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/stats"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/statsconv"
+
 	libvirt "github.com/libvirt/libvirt-go"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
-	domainerrors "gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/statsconv"
 )
 
 type Connection interface {

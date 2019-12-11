@@ -7,12 +7,13 @@ import (
 	"sync"
 	"time"
 
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/api"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/stats"
+
 	cstructs "github.com/hashicorp/nomad/client/structs"
 	cpustats "github.com/hashicorp/nomad/helper/stats"
 	"github.com/hashicorp/nomad/plugins/drivers"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
 )
 
 func init() {

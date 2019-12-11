@@ -3,11 +3,11 @@ package statsconv
 import (
 	"encoding/xml"
 
-	"github.com/libvirt/libvirt-go"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/api"
+	domainerrors "github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/errors"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/stats"
 
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/api"
-	domainerrors "gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/errors"
-	"gitlab.com/harmonyedge/nomad-driver-libvirt/libvirt/virtwrap/stats"
+	"github.com/libvirt/libvirt-go"
 )
 
 type DomainIdentifier interface {
