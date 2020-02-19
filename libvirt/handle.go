@@ -12,6 +12,8 @@ import (
 	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/stats"
 
 	cstructs "github.com/hashicorp/nomad/client/structs"
+
+	// TODO in new nomad version, stats come from executor
 	cpustats "github.com/hashicorp/nomad/helper/stats"
 	"github.com/hashicorp/nomad/plugins/drivers"
 )
@@ -23,6 +25,9 @@ func init() {
 }
 
 type taskHandle struct {
+	// stateLock syncs access to all fields below
+	stateLock sync.RWMutex
+
 	domainManager     virtwrap.DomainManager
 	resultChan        chan *drivers.ExitResult
 	task              *drivers.TaskConfig
@@ -33,12 +38,33 @@ type taskHandle struct {
 	resourceUsage     *cstructs.TaskResourceUsage
 	resourceUsageLock sync.Mutex
 	prevDomainStat    *stats.DomainStats
+
+	// add any extra relevant information about the task.
+	pid int
 }
 
-type taskHandleState struct {
+// TaskState is the runtime state which is encoded in the handle returned to
+// Nomad client.
+// This information is needed to rebuild the task state and handler during
+// recovery.
+type TaskState struct {
+	// TODO add fields
+	//ReattachConfig *structs.ReattachConfig
+	TaskConfig     *drivers.TaskConfig
+
 	startedAt   time.Time
 	completedAt time.Time
 	exitResult  *drivers.ExitResult
+
+	// TODO: add any extra important values that must be persisted in order
+	// to restore a task.
+	//
+	// The plugin keeps track of its running tasks in a in-memory data
+	// structure. If the plugin crashes, this data will be lost, so Nomad
+	// will respawn a new instance of the plugin and try to restore its
+	// in-memory representation of the running tasks using the RecoverTask()
+	// method below.
+	Pid int
 }
 
 func (h *taskHandle) KillVM() error {
@@ -49,11 +75,17 @@ func (h *taskHandle) DestroyVM() error {
 	return h.domainManager.DestroyVM(api.TaskID2DomainName(h.task.ID))
 }
 
-func (h *taskHandle) buildState() *taskHandleState {
-	return &taskHandleState{
-		startedAt:   h.startedAt,
-		completedAt: h.completedAt,
-		exitResult:  h.exitResult,
+func (h *taskHandle) buildState(cfg *drivers.TaskConfig) *TaskState {
+//func (h *taskHandle) buildState(config *plugin.ClientConfig) *TaskState {
+	//pluginClient := plugin.NewClient(config)
+
+	return &TaskState{
+		// TODO add fields
+		//ReattachConfig: structs.ReattachConfigFromGoPlugin(pluginClient.ReattachConfig()),
+		TaskConfig:     cfg,
+		startedAt:      h.startedAt,
+		completedAt:    h.completedAt,
+		exitResult:     h.exitResult,
 	}
 }
 
@@ -158,4 +190,22 @@ func (h *taskHandle) HandleEvent(event api.LibvirtEvent) *drivers.TaskEvent {
 		Timestamp: time.Now(),
 		Message:   fmt.Sprintf("domain state change %s, reason: %s\n", event.State, event.Reason),
 	}
+}
+
+// Signal sends the passed signal to the task
+func (h *taskHandle) Signal(sig os.Signal) error {
+	// TODO access the process via pid and signal the process
+
+	//if e.childCmd.Process == nil {
+	//	return fmt.Errorf("Task not yet run")
+	//}
+	//
+	//e.logger.Debug("sending signal to PID", "signal", s, "pid", e.childCmd.Process.Pid)
+	//err := e.childCmd.Process.Signal(s)
+	//if err != nil {
+	//	e.logger.Error("sending signal failed", "signal", s, "error", err)
+	//	return err
+	//}
+
+	return nil
 }

@@ -1,39 +1,37 @@
 package virtwrap
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"testing"
 
-	"gitlab.com/smartding/tlibvirt/virtwrap/api"
-	"gitlab.com/smartding/tlibvirt/virtwrap/util"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/api"
 )
 
 func TestSyncVM(t *testing.T) {
-	ctx, _ := context.WithCancel(context.Background())
-	//setup libvirt domain manager
-	err := util.SetupLibvirt()
-	if err != nil {
-		panic(err)
-	}
-	util.StartLibvirt(ctx)
-	if err != nil {
-		panic(err)
-	}
-	util.StartVirtlog(ctx)
-
-	domainConn := util.CreateLibvirtConnection()
-	defer domainConn.Close()
-
-	domainManager, err := NewLibvirtDomainManager(domainConn)
-
-	taskCfg := readJsonFile("task.json")
-	if _, err := domainManager.SyncVM(taskCfg); err != nil {
-		fmt.Printf("err = %+v\n", err)
-	}
+	//ctx, _ := context.WithCancel(context.Background())
+	////setup libvirt domain manager
+	//err := util.SetupLibvirt()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//util.StartLibvirt(ctx)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//util.StartVirtlog(ctx)
+	//
+	//domainConn := util.CreateLibvirtConnection()
+	//defer domainConn.Close()
+	//
+	//domainManager, err := NewLibvirtDomainManager(domainConn)
+	//
+	//taskCfg := readJsonFile("task.json")
+	//if _, err := domainManager.SyncVM(taskCfg); err != nil {
+	//	fmt.Printf("err = %+v\n", err)
+	//}
 
 }
 

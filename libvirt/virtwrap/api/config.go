@@ -6,7 +6,14 @@ import (
 	"github.com/hashicorp/nomad/plugins/shared/hclspec"
 )
 
+// TaskConfig contains configuration information for a task that runs with
+// this plugin
 type TaskConfig struct {
+	// create decoded plugin task configuration struct
+	//
+	// This struct is the decoded version of the schema defined in the
+	// taskConfigSpec variable above. It's used to convert the string
+	// configuration for the task into Go constructs.
 	Name        string             `codec:"name"`
 	Memory      MemoryConfig       `codec:"memory"`
 	VCPU        uint32             `codec:"vcpu"`
