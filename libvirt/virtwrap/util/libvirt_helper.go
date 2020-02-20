@@ -22,17 +22,6 @@ var (
 	testLogger hclog.Logger
 )
 
-func GetTestLogger() hclog.Logger {
-	initOnce.Do(func() {
-		testLogger = hclog.New(&hclog.LoggerOptions{
-			Name:  "nomad-driver-libvirt-test",
-			Level: hclog.LevelFromString("DEBUG"),
-		})
-	})
-
-	return testLogger
-}
-
 func SetupLibvirt(logger hclog.Logger) error {
 
 	// TODO: setting permissions and owners is not part of device plugins.

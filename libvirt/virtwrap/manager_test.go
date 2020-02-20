@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/nomad/client/testutil"
+	"github.com/hashicorp/nomad/helper/testlog"
 	"github.com/hashicorp/nomad/helper/uuid"
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/hashicorp/nomad/plugins/drivers"
@@ -19,7 +20,7 @@ import (
 func TestManageLifecycle(t *testing.T) {
 	testutil.RequireRoot(t)
 
-	logger := util.GetTestLogger()
+	logger := testlog.HCLogger(t)
 	require := require.New(t)
 
 	myTaskCfg := &api.TaskConfig{
