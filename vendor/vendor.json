@@ -24,6 +24,20 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "nEVw+80Junfo7iEY7ThP7Ci9Pyk=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/Microsoft/go-winio",
+			"path": "github.com/Microsoft/go-winio",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "/ykkyb7gmtZC68n7T24xwbmlCBc=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/Microsoft/go-winio/pkg/guid",
+			"path": "github.com/Microsoft/go-winio/pkg/guid",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
 			"checksumSHA1": "iggzLdOhYFfuI2Q+EsjtmSgufOk=",
 			"origin": "github.com/docker/docker/vendor/github.com/Microsoft/hcsshim/osversion",
 			"path": "github.com/Microsoft/hcsshim/osversion",
@@ -593,6 +607,30 @@
 			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
+			"checksumSHA1": "P1mDpjtKhcMWERadeEfxoecqz4Y=",
+			"path": "github.com/hashicorp/nomad/client/lib/fifo",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "AkLMBfAGXnG+5BqQY3zYC2lZYJw=",
+			"path": "github.com/hashicorp/nomad/client/logmon",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "8FvX7CJ1ka/EoD4IKG4Tx+4sAXI=",
+			"path": "github.com/hashicorp/nomad/client/logmon/logging",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "VgXehszzMsYKTDxGuF70s3Q0+Hg=",
+			"path": "github.com/hashicorp/nomad/client/logmon/proto",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
 			"checksumSHA1": "twpOYKnxJyoga5j44xKSmFBQq1Q=",
 			"path": "github.com/hashicorp/nomad/client/pluginmanager/drivermanager/state",
 			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
@@ -615,6 +653,12 @@
 			"path": "github.com/hashicorp/nomad/client/structs",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "jJgtfySMoJlE8fxRFE4MSaP8O5Y=",
+			"path": "github.com/hashicorp/nomad/client/taskenv",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "cujDj8Iz7p8tFMuLcqwIbsDo62U=",
@@ -733,8 +777,8 @@
 		{
 			"checksumSHA1": "WyoNwrElKIcY8s1Ax1JWwTLR31A=",
 			"path": "github.com/hashicorp/nomad/plugins",
-			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
-			"revisionTime": "2019-05-06T22:42:52Z"
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "fifF9YDXPr4PBVh+vHCeCUliMHI=",
@@ -767,16 +811,22 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
-			"checksumSHA1": "wRRcfGQ+Kpdot+fW2/aJ9BsADHA=",
+			"checksumSHA1": "KmI0s/cLLdsNBNZBZjdu1m6GeZk=",
 			"path": "github.com/hashicorp/nomad/plugins/drivers",
-			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
-			"revisionTime": "2019-05-06T22:42:52Z"
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
-			"checksumSHA1": "K2sb96dVJDt2Nk6TyfsegL4ffVY=",
+			"checksumSHA1": "+LLmrTVathFk445fVWCuyEJZVIU=",
 			"path": "github.com/hashicorp/nomad/plugins/drivers/proto",
-			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
-			"revisionTime": "2019-05-06T22:42:52Z"
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "IJ3Tz4+c1z35OYjXBhsk3/12ooo=",
+			"path": "github.com/hashicorp/nomad/plugins/drivers/testutils",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "XULidXs+ZoBhp2MofBd4bfaiWpg=",
