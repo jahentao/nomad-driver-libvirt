@@ -83,6 +83,7 @@ const (
 	NodeUpdateEligibilityRequestType
 	BatchNodeUpdateDrainRequestType
 	SchedulerConfigRequestType
+	NodeBatchDeregisterRequestType
 )
 
 const (
@@ -209,6 +210,13 @@ type QueryOptions struct {
 	Region string
 
 	// Namespace is the target namespace for the query.
+	//
+	// Since handlers do not have a default value set they should access
+	// the Namespace via the RequestNamespace method.
+	//
+	// Requests accessing specific namespaced objects must check ACLs
+	// against the namespace of the object, not the namespace in the
+	// request.
 	Namespace string
 
 	// If set, wait until query exceeds given index. Must be provided
@@ -235,6 +243,11 @@ func (q QueryOptions) RequestRegion() string {
 	return q.Region
 }
 
+// RequestNamespace returns the request's namespace or the default namespace if
+// no explicit namespace was sent.
+//
+// Requests accessing specific namespaced objects must check ACLs against the
+// namespace of the object, not the namespace in the request.
 func (q QueryOptions) RequestNamespace() string {
 	if q.Namespace == "" {
 		return DefaultNamespace
@@ -256,6 +269,13 @@ type WriteRequest struct {
 	Region string
 
 	// Namespace is the target namespace for the write.
+	//
+	// Since RPC handlers do not have a default value set they should
+	// access the Namespace via the RequestNamespace method.
+	//
+	// Requests accessing specific namespaced objects must check ACLs
+	// against the namespace of the object, not the namespace in the
+	// request.
 	Namespace string
 
 	// AuthToken is secret portion of the ACL token used for the request
@@ -269,6 +289,11 @@ func (w WriteRequest) RequestRegion() string {
 	return w.Region
 }
 
+// RequestNamespace returns the request's namespace or the default namespace if
+// no explicit namespace was sent.
+//
+// Requests accessing specific namespaced objects must check ACLs against the
+// namespace of the object, not the namespace in the request.
 func (w WriteRequest) RequestNamespace() string {
 	if w.Namespace == "" {
 		return DefaultNamespace
@@ -322,6 +347,13 @@ type NodeDeregisterRequest struct {
 	WriteRequest
 }
 
+// NodeBatchDeregisterRequest is used for Node.BatchDeregister endpoint
+// to deregister a batch of nodes from being schedulable entities.
+type NodeBatchDeregisterRequest struct {
+	NodeIDs []string
+	WriteRequest
+}
+
 // NodeServerInfo is used to in NodeUpdateResponse to return Nomad server
 // information used in RPC server lists.
 type NodeServerInfo struct {
@@ -347,6 +379,7 @@ type NodeUpdateStatusRequest struct {
 	NodeID    string
 	Status    string
 	NodeEvent *NodeEvent
+	UpdatedAt int64
 	WriteRequest
 }
 
@@ -367,6 +400,9 @@ type NodeUpdateDrainRequest struct {
 	// NodeEvent is the event added to the node
 	NodeEvent *NodeEvent
 
+	// UpdatedAt represents server time of receiving request
+	UpdatedAt int64
+
 	WriteRequest
 }
 
@@ -378,6 +414,9 @@ type BatchNodeUpdateDrainRequest struct {
 
 	// NodeEvents is a mapping of the node to the event to add to the node
 	NodeEvents map[string]*NodeEvent
+
+	// UpdatedAt represents server time of receiving request
+	UpdatedAt int64
 
 	WriteRequest
 }
@@ -398,6 +437,9 @@ type NodeUpdateEligibilityRequest struct {
 
 	// NodeEvent is the event added to the node
 	NodeEvent *NodeEvent
+
+	// UpdatedAt represents server time of receiving request
+	UpdatedAt int64
 
 	WriteRequest
 }
@@ -508,8 +550,8 @@ type EvalOptions struct {
 
 // JobSpecificRequest is used when we just need to specify a target job
 type JobSpecificRequest struct {
-	JobID     string
-	AllAllocs bool
+	JobID string
+	All   bool
 	QueryOptions
 }
 
@@ -1282,7 +1324,6 @@ type EmitNodeEventsRequest struct {
 // EmitNodeEventsResponse is a response to the client about the status of
 // the node event source update.
 type EmitNodeEventsResponse struct {
-	Index uint64
 	WriteMeta
 }
 
@@ -3232,7 +3273,8 @@ type Job struct {
 	// to run. Each task group is an atomic unit of scheduling and placement.
 	TaskGroups []*TaskGroup
 
-	// COMPAT: Remove in 0.7.0. Stagger is deprecated in 0.6.0.
+	// See agent.ApiJobToStructJob
+	// Update provides defaults for the TaskGroup Update stanzas
 	Update UpdateStrategy
 
 	// Periodic is used to define the interval the job is run at.
@@ -3382,6 +3424,12 @@ func (j *Job) Validate() error {
 	}
 	if len(j.Datacenters) == 0 {
 		mErr.Errors = append(mErr.Errors, errors.New("Missing job datacenters"))
+	} else {
+		for _, v := range j.Datacenters {
+			if v == "" {
+				mErr.Errors = append(mErr.Errors, errors.New("Job datacenter must be non-empty string"))
+			}
+		}
 	}
 	if len(j.TaskGroups) == 0 {
 		mErr.Errors = append(mErr.Errors, errors.New("Missing job task groups"))
@@ -3476,11 +3524,21 @@ func (j *Job) Warnings() error {
 	var mErr multierror.Error
 
 	// Check the groups
+	ap := 0
 	for _, tg := range j.TaskGroups {
 		if err := tg.Warnings(j); err != nil {
 			outer := fmt.Errorf("Group %q has warnings: %v", tg.Name, err)
 			mErr.Errors = append(mErr.Errors, outer)
 		}
+		if tg.Update != nil && tg.Update.AutoPromote {
+			ap += 1
+		}
+	}
+
+	// Check AutoPromote, should be all or none
+	if ap > 0 && ap < len(j.TaskGroups) {
+		err := fmt.Errorf("auto_promote must be true for all groups to enable automatic promotion")
+		mErr.Errors = append(mErr.Errors, err)
 	}
 
 	return mErr.ErrorOrNil()
@@ -3799,6 +3857,7 @@ var (
 		HealthyDeadline:  5 * time.Minute,
 		ProgressDeadline: 10 * time.Minute,
 		AutoRevert:       false,
+		AutoPromote:      false,
 		Canary:           0,
 	}
 )
@@ -3837,6 +3896,10 @@ type UpdateStrategy struct {
 	// stable version.
 	AutoRevert bool
 
+	// AutoPromote declares that the deployment should be promoted when all canaries are
+	// healthy
+	AutoPromote bool
+
 	// Canary is the number of canaries to deploy when a change to the task
 	// group is detected.
 	Canary int
@@ -3869,6 +3932,9 @@ func (u *UpdateStrategy) Validate() error {
 	}
 	if u.Canary < 0 {
 		multierror.Append(&mErr, fmt.Errorf("Canary count can not be less than zero: %d < 0", u.Canary))
+	}
+	if u.Canary == 0 && u.AutoPromote {
+		multierror.Append(&mErr, fmt.Errorf("Auto Promote requires a Canary count greater than zero"))
 	}
 	if u.MinHealthyTime < 0 {
 		multierror.Append(&mErr, fmt.Errorf("Minimum healthy time may not be less than zero: %v", u.MinHealthyTime))
@@ -5895,15 +5961,15 @@ const (
 	TaskSetupFailure = "Setup Failure"
 
 	// TaskDriveFailure indicates that the task could not be started due to a
-	// failure in the driver.
+	// failure in the driver. TaskDriverFailure is considered Recoverable.
 	TaskDriverFailure = "Driver Failure"
 
 	// TaskReceived signals that the task has been pulled by the client at the
 	// given timestamp.
 	TaskReceived = "Received"
 
-	// TaskFailedValidation indicates the task was invalid and as such was not
-	// run.
+	// TaskFailedValidation indicates the task was invalid and as such was not run.
+	// TaskFailedValidation is not considered Recoverable.
 	TaskFailedValidation = "Failed Validation"
 
 	// TaskStarted signals that the task was started and its timestamp can be
@@ -5966,6 +6032,10 @@ const (
 
 	// TaskHookFailed indicates that one of the hooks for a task failed.
 	TaskHookFailed = "Task hook failed"
+
+	// TaskRestoreFailed indicates Nomad was unable to reattach to a
+	// restored task.
+	TaskRestoreFailed = "Failed Restoring Task"
 )
 
 // TaskEvent is an event that effects the state of a task and contains meta-data
@@ -6985,10 +7055,13 @@ const (
 	DeploymentStatusSuccessful = "successful"
 	DeploymentStatusCancelled  = "cancelled"
 
+	// TODO Statuses and Descriptions do not match 1:1 and we sometimes use the Description as a status flag
+
 	// DeploymentStatusDescriptions are the various descriptions of the states a
 	// deployment can be in.
 	DeploymentStatusDescriptionRunning               = "Deployment is running"
-	DeploymentStatusDescriptionRunningNeedsPromotion = "Deployment is running but requires promotion"
+	DeploymentStatusDescriptionRunningNeedsPromotion = "Deployment is running but requires manual promotion"
+	DeploymentStatusDescriptionRunningAutoPromotion  = "Deployment is running pending automatic promotion"
 	DeploymentStatusDescriptionPaused                = "Deployment is paused"
 	DeploymentStatusDescriptionSuccessful            = "Deployment completed successfully"
 	DeploymentStatusDescriptionStoppedJob            = "Cancelled because job is stopped"
@@ -7139,6 +7212,19 @@ func (d *Deployment) RequiresPromotion() bool {
 	return false
 }
 
+// HasAutoPromote determines if all taskgroups are marked auto_promote
+func (d *Deployment) HasAutoPromote() bool {
+	if d == nil || len(d.TaskGroups) == 0 || d.Status != DeploymentStatusRunning {
+		return false
+	}
+	for _, group := range d.TaskGroups {
+		if !group.AutoPromote {
+			return false
+		}
+	}
+	return true
+}
+
 func (d *Deployment) GoString() string {
 	base := fmt.Sprintf("Deployment ID %q for job %q has status %q (%v):", d.ID, d.JobID, d.Status, d.StatusDescription)
 	for group, state := range d.TaskGroups {
@@ -7152,6 +7238,10 @@ type DeploymentState struct {
 	// AutoRevert marks whether the task group has indicated the job should be
 	// reverted on failure
 	AutoRevert bool
+
+	// AutoPromote marks promotion triggered automatically by healthy canaries
+	// copied from TaskGroup UpdateStrategy in scheduler.reconcile
+	AutoPromote bool
 
 	// ProgressDeadline is the deadline by which an allocation must transition
 	// to healthy before the deployment is considered failed.
@@ -7193,6 +7283,7 @@ func (d *DeploymentState) GoString() string {
 	base += fmt.Sprintf("\n\tHealthy: %d", d.HealthyAllocs)
 	base += fmt.Sprintf("\n\tUnhealthy: %d", d.UnhealthyAllocs)
 	base += fmt.Sprintf("\n\tAutoRevert: %v", d.AutoRevert)
+	base += fmt.Sprintf("\n\tAutoPromote: %v", d.AutoPromote)
 	return base
 }
 
@@ -8335,6 +8426,9 @@ type Evaluation struct {
 	// Raft Indexes
 	CreateIndex uint64
 	ModifyIndex uint64
+
+	CreateTime int64
+	ModifyTime int64
 }
 
 // TerminalStatus returns if the current status is terminal and
@@ -8434,6 +8528,7 @@ func (e *Evaluation) MakePlan(j *Job) *Plan {
 
 // NextRollingEval creates an evaluation to followup this eval for rolling updates
 func (e *Evaluation) NextRollingEval(wait time.Duration) *Evaluation {
+	now := time.Now().UTC().UnixNano()
 	return &Evaluation{
 		ID:             uuid.Generate(),
 		Namespace:      e.Namespace,
@@ -8445,6 +8540,8 @@ func (e *Evaluation) NextRollingEval(wait time.Duration) *Evaluation {
 		Status:         EvalStatusPending,
 		Wait:           wait,
 		PreviousEval:   e.ID,
+		CreateTime:     now,
+		ModifyTime:     now,
 	}
 }
 
@@ -8454,7 +8551,7 @@ func (e *Evaluation) NextRollingEval(wait time.Duration) *Evaluation {
 // quota limit was reached.
 func (e *Evaluation) CreateBlockedEval(classEligibility map[string]bool,
 	escaped bool, quotaReached string) *Evaluation {
-
+	now := time.Now().UTC().UnixNano()
 	return &Evaluation{
 		ID:                   uuid.Generate(),
 		Namespace:            e.Namespace,
@@ -8468,6 +8565,8 @@ func (e *Evaluation) CreateBlockedEval(classEligibility map[string]bool,
 		ClassEligibility:     classEligibility,
 		EscapedComputedClass: escaped,
 		QuotaLimitReached:    quotaReached,
+		CreateTime:           now,
+		ModifyTime:           now,
 	}
 }
 
@@ -8476,6 +8575,7 @@ func (e *Evaluation) CreateBlockedEval(classEligibility map[string]bool,
 // be retried by the eval_broker. Callers should copy the created eval's ID to
 // into the old eval's NextEval field.
 func (e *Evaluation) CreateFailedFollowUpEval(wait time.Duration) *Evaluation {
+	now := time.Now().UTC().UnixNano()
 	return &Evaluation{
 		ID:             uuid.Generate(),
 		Namespace:      e.Namespace,
@@ -8487,6 +8587,20 @@ func (e *Evaluation) CreateFailedFollowUpEval(wait time.Duration) *Evaluation {
 		Status:         EvalStatusPending,
 		Wait:           wait,
 		PreviousEval:   e.ID,
+		CreateTime:     now,
+		ModifyTime:     now,
+	}
+}
+
+// UpdateModifyTime takes into account that clocks on different servers may be
+// slightly out of sync. Even in case of a leader change, this method will
+// guarantee that ModifyTime will always be after CreateTime.
+func (e *Evaluation) UpdateModifyTime() {
+	now := time.Now().UTC().UnixNano()
+	if now <= e.CreateTime {
+		e.ModifyTime = e.CreateTime + 1
+	} else {
+		e.ModifyTime = now
 	}
 }
 
@@ -8546,6 +8660,11 @@ type Plan struct {
 	// lower priority jobs that are preempted. Preempted allocations are marked
 	// as evicted.
 	NodePreemptions map[string][]*Allocation
+
+	// SnapshotIndex is the Raft index of the snapshot used to create the
+	// Plan. The leader will wait to evaluate the plan until its StateStore
+	// has reached at least this index.
+	SnapshotIndex uint64
 }
 
 // AppendStoppedAlloc marks an allocation to be stopped. The clientStatus of the

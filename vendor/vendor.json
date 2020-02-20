@@ -3,11 +3,32 @@
 	"ignore": "test",
 	"package": [
 		{
+			"checksumSHA1": "9NFR6RG8H2fNyKHscGmuGLQhRm4=",
+			"origin": "github.com/docker/docker/vendor/github.com/Azure/go-ansiterm",
+			"path": "github.com/Azure/go-ansiterm",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "3/UphB+6Hbx5otA4PjFjvObT+L4=",
+			"origin": "github.com/docker/docker/vendor/github.com/Azure/go-ansiterm/winterm",
+			"path": "github.com/Azure/go-ansiterm/winterm",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
 			"checksumSHA1": "Jmf4AnrptgBdQ5TPBJ2M89nooIQ=",
 			"origin": "github.com/hashicorp/nomad/vendor/github.com/LK4D4/joincontext",
 			"path": "github.com/LK4D4/joincontext",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "iggzLdOhYFfuI2Q+EsjtmSgufOk=",
+			"origin": "github.com/docker/docker/vendor/github.com/Microsoft/hcsshim/osversion",
+			"path": "github.com/Microsoft/hcsshim/osversion",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
 		},
 		{
 			"checksumSHA1": "qtjd74+bErubh+qyv3s+lWmn9wc=",
@@ -38,11 +59,217 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "R1Q34Pfnt197F/nCOO9kG8c+Z90=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/boltdb/bolt",
+			"path": "github.com/boltdb/bolt",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "ru5eKWdLzXfpNRL+Mi1bxbmY8DU=",
+			"origin": "github.com/docker/docker/vendor/github.com/containerd/containerd/errdefs",
+			"path": "github.com/containerd/containerd/errdefs",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "NCbMhsHDjvCTNYw10fV7deTC8/4=",
+			"origin": "github.com/docker/docker/vendor/github.com/containerd/continuity/fs",
+			"path": "github.com/containerd/continuity/fs",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "za2TXa2xq+zMGLTZT/RPsUz/17s=",
+			"origin": "github.com/docker/docker/vendor/github.com/containerd/continuity/syscallx",
+			"path": "github.com/containerd/continuity/syscallx",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "PkcX9ZJL73//MBA3VRubqi2Kp8U=",
+			"origin": "github.com/docker/docker/vendor/github.com/containerd/continuity/sysx",
+			"path": "github.com/containerd/continuity/sysx",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
 			"checksumSHA1": "mrz/kicZiUaHxkyfvC/DyQcr8Do=",
 			"origin": "github.com/hashicorp/nomad/vendor/github.com/davecgh/go-spew/spew",
 			"path": "github.com/davecgh/go-spew/spew",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "RSYwLEyer/ljgsJmrtMIviMXBEE=",
+			"origin": "github.com/docker/docker/vendor/github.com/docker/distribution/registry/api/errcode",
+			"path": "github.com/docker/distribution/registry/api/errcode",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "/jF0HVFiLzUUuywSjp4F/piM7BM=",
+			"path": "github.com/docker/docker/api/types/blkiodev",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "GZPfkvfeUPkleeBefqebW1+S4b0=",
+			"path": "github.com/docker/docker/api/types/container",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "pH6fpTIT4mBLg+i+9fnifaDQiIU=",
+			"path": "github.com/docker/docker/api/types/filters",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "9OClWW7OCikgz4QCS/sAVcvqcWk=",
+			"path": "github.com/docker/docker/api/types/mount",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "lbsNxTxZ4aLkN/7RhmK/5WRoDwM=",
+			"path": "github.com/docker/docker/api/types/network",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "lC3MGcDXUBpmPtn4LQ9cavJMyAE=",
+			"path": "github.com/docker/docker/api/types/registry",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "OQEUS/2J2xVHpfvcsxcXzYqBSeY=",
+			"path": "github.com/docker/docker/api/types/strslice",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "cPdBFPrzvOzbqK4misfpG74Fa6E=",
+			"path": "github.com/docker/docker/api/types/swarm",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "bZaUxSqqaFRghfaL1Z4b9W+duhE=",
+			"path": "github.com/docker/docker/api/types/swarm/runtime",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "MZsgRjJJ0D/gAsXfKiEys+op6dE=",
+			"path": "github.com/docker/docker/api/types/versions",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "q4R77xtScr+W3m77Otw6kr34ktg=",
+			"path": "github.com/docker/docker/errdefs",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "DmVcRzmqI4z4aOH9ciIEJKtzFho=",
+			"path": "github.com/docker/docker/pkg/archive",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "eMoRb/diYeuYLojU7ChN5DaETHc=",
+			"path": "github.com/docker/docker/pkg/fileutils",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "mNR92hhd6LtKaSFtglL/rfl9dDo=",
+			"path": "github.com/docker/docker/pkg/homedir",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "K9OcyoMKNt/w7u4FzhegR1rjnz8=",
+			"path": "github.com/docker/docker/pkg/idtools",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "vZk7/lVjHDlRDDf5XJbNMock1WI=",
+			"path": "github.com/docker/docker/pkg/ioutils",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "v9Vp0GrNfvfWzhlLz18oqnu959E=",
+			"path": "github.com/docker/docker/pkg/jsonmessage",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "EXiIm2xIL7Ds+YsQUx8Z3eUYPtI=",
+			"path": "github.com/docker/docker/pkg/longpath",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "p59ftZp4dFxrfMloll3NQ6E7ecM=",
+			"path": "github.com/docker/docker/pkg/mount",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "Yl6cD918tLOXa0I/iuGiovmszQU=",
+			"path": "github.com/docker/docker/pkg/pools",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "w0waeTRJ1sFygI0dZXH6l9E1c60=",
+			"path": "github.com/docker/docker/pkg/stdcopy",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "u0YG5CZSZtQUd1Jp7GQE1zr1ahM=",
+			"path": "github.com/docker/docker/pkg/system",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "XRmmAW8XT4s/T5aWgyJ/zoZ6UDY=",
+			"path": "github.com/docker/docker/pkg/term",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "TcF/eOWcG/6Knb6pbJgcwLoIwaw=",
+			"path": "github.com/docker/docker/pkg/term/windows",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "1IPGX6/BnX7QN4DjbBk0UafTB2U=",
+			"origin": "github.com/docker/docker/vendor/github.com/docker/go-connections/nat",
+			"path": "github.com/docker/go-connections/nat",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "18hmvak2Dc9x5cgKeZ2iApviT7w=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/docker/go-units",
+			"path": "github.com/docker/go-units",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "KF8P7W2dkTmpEcHgsy2KvkV5Lvo=",
+			"path": "github.com/fsouza/go-dockerclient",
+			"revision": "0f160ccc8fad45a42791aa629d511f5516aa1641",
+			"revisionTime": "2020-02-18T01:06:13Z"
 		},
 		{
 			"checksumSHA1": "IvHj/4iR2nYa/S3cB2GXoyDG/xQ=",
@@ -57,6 +284,13 @@
 			"path": "github.com/go-ole/go-ole/oleutil",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "ijGm/LRNG6ePIU9EevCTDWkrIRc=",
+			"origin": "github.com/docker/docker/vendor/github.com/gogo/protobuf/proto",
+			"path": "github.com/gogo/protobuf/proto",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
 		},
 		{
 			"checksumSHA1": "Pyou8mceOASSFxc7GeXZuVdSMi0=",
@@ -126,6 +360,13 @@
 			"path": "github.com/hashicorp/consul/api",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "E28E4zR1FN2v1Xiq4FUER7KVN9M=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/hashicorp/consul/lib/freeport",
+			"path": "github.com/hashicorp/consul/lib/freeport",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "cdOCt0Yb+hdErz8NAQqayxPmRsY=",
@@ -328,6 +569,42 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "FMszw9e346/9hpeZBp8zoJG7/0o=",
+			"path": "github.com/hashicorp/nomad/client/allocrunner/taskrunner/state",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "Zc36TJDhU/bMOa5K2Z8DTpeFeTY=",
+			"path": "github.com/hashicorp/nomad/client/config",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "XiFCvluM+JSCMTe+qYsn21Gm3Kg=",
+			"path": "github.com/hashicorp/nomad/client/devicemanager/state",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "0MjncA0AI6PAwt341QUZ4pta8L0=",
+			"path": "github.com/hashicorp/nomad/client/fingerprint",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "twpOYKnxJyoga5j44xKSmFBQq1Q=",
+			"path": "github.com/hashicorp/nomad/client/pluginmanager/drivermanager/state",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "wbJQMoTrmjhX9Rv1Tj1q0aSX598=",
+			"path": "github.com/hashicorp/nomad/client/state",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
 			"checksumSHA1": "PnUpH8uszHR8wmKXDsOckZH8fC4=",
 			"path": "github.com/hashicorp/nomad/client/stats",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
@@ -362,6 +639,18 @@
 			"path": "github.com/hashicorp/nomad/helper/args",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "onauVx8tpBSfLHXnMrxp7y+OPAM=",
+			"path": "github.com/hashicorp/nomad/helper/boltdd",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "VDVauu8eWFf5h1u1fKL53VN4JgY=",
+			"path": "github.com/hashicorp/nomad/helper/discover",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "KtK2/d4wBHjMqdR/SAa6cSDmxQ0=",
@@ -406,6 +695,12 @@
 			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
+			"checksumSHA1": "v8/iYXxti8JJjQUp+N3xwFekipw=",
+			"path": "github.com/hashicorp/nomad/helper/useragent",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
 			"checksumSHA1": "mSCo/iZUEOSpeX5NsGZZzFMJqto=",
 			"path": "github.com/hashicorp/nomad/helper/uuid",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
@@ -418,10 +713,16 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
-			"checksumSHA1": "eQsfs/B2/hGf6PBY6uXoAL7D9GE=",
+			"checksumSHA1": "1nISNfUhdIjHnZnLb9IUgXdFkEw=",
+			"path": "github.com/hashicorp/nomad/nomad/mock",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "0FdJqDCGuBuxWQpVXetgs7eqYCs=",
 			"path": "github.com/hashicorp/nomad/nomad/structs",
-			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
-			"revisionTime": "2019-05-06T22:42:52Z"
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "OHW0mibgWYtYtetuQgjNTguYvf8=",
@@ -494,6 +795,18 @@
 			"path": "github.com/hashicorp/nomad/plugins/shared/structs/proto",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "GiLdmpiZBor5cpvTjZDoXf+wmgY=",
+			"path": "github.com/hashicorp/nomad/testutil",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "lgkEwwYXsJptp3+V07reNohjtPo=",
+			"path": "github.com/hashicorp/nomad/version",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "ujL3Sc5iqc28/En2ndmc2R7oUQM=",
@@ -580,6 +893,27 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "Aulh7C5SVOA4Jzt5eHNH6197Mbk=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/konsorten/go-windows-terminal-sequences",
+			"path": "github.com/konsorten/go-windows-terminal-sequences",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "eOXF2PEvYLMeD8DSzLZJWbjYzco=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/kr/pretty",
+			"path": "github.com/kr/pretty",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "uulQHQ7IsRKqDudBC8Go9J0gtAc=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/kr/text",
+			"path": "github.com/kr/text",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
 			"checksumSHA1": "ERkbsgnbA8DKKQ2PXAblqoYJOYQ=",
 			"path": "github.com/libvirt/libvirt-go",
 			"revision": "d5e0adac44d4365a2d97e259f51ab76cc3c01b20",
@@ -635,11 +969,81 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "H+KPzVkPvMwBdRiwChcPzDnwlzk=",
+			"origin": "github.com/docker/docker/vendor/github.com/morikuni/aec",
+			"path": "github.com/morikuni/aec",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
 			"checksumSHA1": "nf3UoPNBIut7BL9nWE8Fw2X2j+Q=",
 			"origin": "github.com/hashicorp/nomad/vendor/github.com/oklog/run",
 			"path": "github.com/oklog/run",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "0lSX9qmKL1rZMG01W/PxSE/AkpY=",
+			"origin": "github.com/docker/docker/vendor/github.com/opencontainers/go-digest",
+			"path": "github.com/opencontainers/go-digest",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "0vsIK/09u0FwE89WDfSFJvOXui4=",
+			"origin": "github.com/docker/docker/vendor/github.com/opencontainers/image-spec/specs-go",
+			"path": "github.com/opencontainers/image-spec/specs-go",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "jdbXRRzeu0njLE9/nCEZG+Yg/Jk=",
+			"origin": "github.com/docker/docker/vendor/github.com/opencontainers/image-spec/specs-go/v1",
+			"path": "github.com/opencontainers/image-spec/specs-go/v1",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "aWtm1zkVCz9l2/zQNfnc246yQew=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/opencontainers/runc/libcontainer/cgroups",
+			"path": "github.com/opencontainers/runc/libcontainer/cgroups",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "v9sgw4eYRNSsJUSG33OoFIwLqRI=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/opencontainers/runc/libcontainer/configs",
+			"path": "github.com/opencontainers/runc/libcontainer/configs",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "SInqynLK8NjJIeFs0Mtk4g8LJ+A=",
+			"origin": "github.com/docker/docker/vendor/github.com/opencontainers/runc/libcontainer/system",
+			"path": "github.com/opencontainers/runc/libcontainer/system",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "p4QZ2sKPz75CkUubhA4vgb8BQro=",
+			"origin": "github.com/docker/docker/vendor/github.com/opencontainers/runc/libcontainer/user",
+			"path": "github.com/opencontainers/runc/libcontainer/user",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
+		},
+		{
+			"checksumSHA1": "AMYc2X2O/IL6EGrq6lTl5vEhLiY=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/opencontainers/runtime-spec/specs-go",
+			"path": "github.com/opencontainers/runtime-spec/specs-go",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
+			"checksumSHA1": "879SELIlVZT5VGoCgpTKwT2PpXc=",
+			"origin": "github.com/docker/docker/vendor/github.com/pkg/errors",
+			"path": "github.com/pkg/errors",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
 		},
 		{
 			"checksumSHA1": "LuFv4/jlrmFNnDb/5SCSEPAM9vU=",
@@ -710,6 +1114,13 @@
 			"path": "github.com/shirou/w32",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "SVO+Zm6SNwWrpgyc6mcTXbH4aJ8=",
+			"origin": "github.com/hashicorp/nomad/vendor/github.com/sirupsen/logrus",
+			"path": "github.com/sirupsen/logrus",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "6LwXZI7kXm1C0h4Ui0Y52p9uQhk=",
@@ -857,6 +1268,13 @@
 			"path": "golang.org/x/net/trace",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "iEK5hCRfrkdc1JOJsaiWuymHmeQ=",
+			"origin": "github.com/docker/docker/vendor/golang.org/x/sync/errgroup",
+			"path": "golang.org/x/sync/errgroup",
+			"revision": "d8772509d1a29b100c52c5c0f6cb5787a693db91",
+			"revisionTime": "2020-02-14T22:19:43Z"
 		},
 		{
 			"checksumSHA1": "REkmyB368pIiip76LiqMLspgCRk=",
