@@ -7,13 +7,13 @@ import (
 	"github.com/hashicorp/nomad/helper/uuid"
 	"github.com/hashicorp/nomad/nomad/structs"
 	"github.com/hashicorp/nomad/plugins/drivers"
-	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/util"
 	"github.com/stretchr/testify/require"
 	"io/ioutil"
 	"os"
 	"testing"
 
 	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/api"
+	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/util"
 )
 
 func TestManageLifecycle(t *testing.T) {
@@ -76,6 +76,8 @@ func TestManageLifecycle(t *testing.T) {
 	// the libvirtd.service should be running
 	//ctx, _ := context.WithCancel(context.Background())
 	//util.StartLibvirt(ctx, logger)
+
+	util.RequireLibvirt(t)
 
 	// 2. create connection
 	domainConn, err := util.CreateLibvirtConnection()

@@ -69,8 +69,6 @@ var (
 	// 	Factory: func(l hclog.Logger) interface{} { return NewLibvirtDriver(l) },
 	// }
 
-	libvirtVersionRegex = regexp.MustCompile(`\d+\.\d+\.\d+`)
-
 	// pluginInfo describes the plugin, and is the response returned for the PluginInfo RPC
 	pluginInfo = &base.PluginInfoResponse{
 		Type:              base.PluginTypeDriver,
