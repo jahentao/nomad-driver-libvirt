@@ -17,7 +17,7 @@ import (
 	"github.com/jahentao/nomad-driver-libvirt/libvirt/virtwrap/util"
 )
 
-func TestManageLifecycle(t *testing.T) {
+func TestManager_AllLifecycle(t *testing.T) {
 	testutil.RequireRoot(t)
 
 	logger := testlog.HCLogger(t)
