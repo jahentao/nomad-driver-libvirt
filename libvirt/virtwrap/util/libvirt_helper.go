@@ -109,7 +109,7 @@ func StartLibvirt(ctx context.Context, logger hclog.Logger) {
 			go func() {
 				scanner := bufio.NewScanner(reader)
 				for scanner.Scan() {
-					logger.Error("libvirtd", "err"+scanner.Text())
+					logger.Info("libvirtd", scanner.Text())
 				}
 
 				if err := scanner.Err(); err != nil {
