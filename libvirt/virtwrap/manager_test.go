@@ -1,7 +1,6 @@
 package virtwrap
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/hashicorp/nomad/client/testutil"
@@ -20,7 +19,6 @@ import (
 func TestManageLifecycle(t *testing.T) {
 	testutil.RequireRoot(t)
 
-	ctx, _ := context.WithCancel(context.Background())
 	logger := util.GetTestLogger()
 	require := require.New(t)
 
@@ -70,12 +68,14 @@ func TestManageLifecycle(t *testing.T) {
 	}
 
 	// 1. setup libvirt domain manager
-	err := util.SetupLibvirt(logger)
-	if err != nil {
-		panic(err)
-	}
+	//err := util.SetupLibvirt(logger)
+	//if err != nil {
+	//	panic(err)
+	//}
+
 	// the libvirtd.service should be running
-	util.StartLibvirt(ctx, logger)
+	//ctx, _ := context.WithCancel(context.Background())
+	//util.StartLibvirt(ctx, logger)
 
 	// 2. create connection
 	domainConn, err := util.CreateLibvirtConnection()
