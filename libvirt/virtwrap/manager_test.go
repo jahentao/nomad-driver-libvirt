@@ -74,6 +74,7 @@ func TestManageLifecycle(t *testing.T) {
 	if err != nil {
 		panic(err)
 	}
+	// the libvirtd.service should be running
 	util.StartLibvirt(ctx, logger)
 
 	// 2. create connection
