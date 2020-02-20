@@ -78,10 +78,10 @@ func TestManageLifecycle(t *testing.T) {
 
 	// 2. create connection
 	domainConn, err := util.CreateLibvirtConnection()
-	defer domainConn.Close()
 	if domainConn == nil || err != nil {
 		panic(err)
 	}
+	defer domainConn.Close()
 
 	domainManager, _ := NewLibvirtDomainManager(domainConn, logger)
 
