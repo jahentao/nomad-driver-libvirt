@@ -44,5 +44,6 @@ example.nomad
 nomad-driver-lxc
 TODO.md
 
-./idea
 *.iml
+.idea
+.circleci
