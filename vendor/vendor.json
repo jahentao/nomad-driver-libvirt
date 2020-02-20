@@ -115,6 +115,12 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "YSEUV/9/k85XciRKu0cngxdjZLE=",
+			"path": "github.com/hashicorp/consul-template/signals",
+			"revision": "d675da81accde69ae7d0fdc9da78c104f774dce4",
+			"revisionTime": "2020-01-31T03:50:54Z"
+		},
+		{
 			"checksumSHA1": "sjEf6EMTPP4NT3m5a0JJmlbLZ8Y=",
 			"origin": "github.com/hashicorp/nomad/vendor/github.com/hashicorp/consul/api",
 			"path": "github.com/hashicorp/consul/api",
@@ -334,6 +340,12 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		},
 		{
+			"checksumSHA1": "cujDj8Iz7p8tFMuLcqwIbsDo62U=",
+			"path": "github.com/hashicorp/nomad/client/testutil",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
+		},
+		{
 			"checksumSHA1": "EWAy5bmtRUbxBxtJ7NCBHscGviE=",
 			"path": "github.com/hashicorp/nomad/drivers/shared/eventer",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
@@ -386,6 +398,12 @@
 			"path": "github.com/hashicorp/nomad/helper/stats",
 			"revision": "9ef81dbe7f27e579ea55fc239f197d0afed0532f",
 			"revisionTime": "2019-05-06T22:42:52Z"
+		},
+		{
+			"checksumSHA1": "cVQj2eonY0hkPL8ozqMUweDri+o=",
+			"path": "github.com/hashicorp/nomad/helper/testlog",
+			"revision": "674bff57541fc4b3a44796979bda1d531c702b08",
+			"revisionTime": "2020-02-19T07:53:04Z"
 		},
 		{
 			"checksumSHA1": "mSCo/iZUEOSpeX5NsGZZzFMJqto=",
@@ -1114,5 +1132,5 @@
 			"revisionTime": "2019-05-06T22:42:52Z"
 		}
 	],
-	"rootPath": "gitlab.com/harmonyedge/nomad-driver-libvirt"
+	"rootPath": "github.com/jahentao/nomad-driver-libvirt"
 }
